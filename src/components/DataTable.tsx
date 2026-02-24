@@ -85,7 +85,7 @@ export default function DataTable<T>({
               </td>
             </tr>
           ) : (
-            sortedData.map((row, idx) => (
+            sortedData.map((row) => (
               <tr
                 key={String(row[rowKey])}
                 onClick={() => onRowClick?.(row)}

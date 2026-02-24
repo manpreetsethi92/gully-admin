@@ -4,7 +4,7 @@ import DataTable from '../components/DataTable'
 import { Users as UsersIcon, CheckCircle, MapPin } from 'lucide-react'
 import { fetchUsers } from '../utils/api'
 import { User } from '../types'
-import { formatDate, formatRelativeTime } from '../utils/format'
+import { formatRelativeTime } from '../utils/format'
 
 export default function Users() {
   const [users, setUsers] = useState<User[]>([])
@@ -23,7 +23,7 @@ export default function Users() {
       setStats({
         total: usrs.length,
         active: usrs.length,
-        verified: usrs.filter(u => u.verification_level === 'verified').length,
+        verified: usrs.filter((u: User) => u.verification_level === 'verified').length,
       })
     } catch (error) {
       console.error('Failed to load users:', error)

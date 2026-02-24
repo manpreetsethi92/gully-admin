@@ -1,14 +1,17 @@
-import { Menu, RefreshCw, Search } from 'lucide-react'
+import { Menu, RefreshCw, Search, LogOut } from 'lucide-react'
 import { useState } from 'react'
 
-export default function TopBar({ onMenuToggle }: { onMenuToggle: () => void }) {
+interface Props {
+  onMenuToggle: () => void
+  onLogout: () => void
+}
+
+export default function TopBar({ onMenuToggle, onLogout }: Props) {
   const [isRefreshing, setIsRefreshing] = useState(false)
 
-  const handleRefresh = async () => {
+  const handleRefresh = () => {
     setIsRefreshing(true)
-    // Trigger a refresh of data
     window.location.reload()
-    setTimeout(() => setIsRefreshing(false), 1000)
   }
 
   return (
@@ -19,22 +22,15 @@ export default function TopBar({ onMenuToggle }: { onMenuToggle: () => void }) {
         </button>
         <div className="hidden md:flex items-center gap-2 bg-dark-bg border border-dark-border rounded-lg px-4 py-2 flex-1 max-w-md">
           <Search size={18} className="text-gray-500" />
-          <input
-            type="text"
-            placeholder="Search..."
-            className="bg-transparent border-0 outline-none text-sm w-full"
-          />
+          <input type="text" placeholder="Search..." className="bg-transparent border-0 outline-none text-sm w-full" />
         </div>
       </div>
-
-      <div className="flex items-center gap-4">
-        <button
-          onClick={handleRefresh}
-          className={`p-2 hover:bg-white/10 rounded-lg transition-all ${
-            isRefreshing ? 'animate-spin' : ''
-          }`}
-        >
+      <div className="flex items-center gap-2">
+        <button onClick={handleRefresh} className={`p-2 hover:bg-white/10 rounded-lg transition-all ${isRefreshing ? 'animate-spin' : ''}`}>
           <RefreshCw size={20} />
+        </button>
+        <button onClick={onLogout} className="p-2 hover:bg-white/10 rounded-lg text-gray-400 hover:text-red-400 transition-colors" title="Logout">
+          <LogOut size={20} />
         </button>
       </div>
     </header>

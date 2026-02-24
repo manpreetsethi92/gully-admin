@@ -38,7 +38,6 @@ export interface WAGroupJob {
   matches_count: number
   urgency: 'high' | 'medium' | 'low'
 }
-
 export interface Request {
   id: string
   user_id: string
@@ -46,10 +45,17 @@ export interface Request {
   description: string
   category: string
   location?: string
-  budget?: string
+  budget_display?: string
+  budget_min?: number | null
+  budget_max?: number | null
   status: 'matching' | 'active' | 'completed' | 'expired'
+  source?: string
+  wa_job_id?: string
+  timeline?: string
+  skills_needed?: string[]
+  contact?: { phone?: string; raw?: string; source?: string }
   created_at: string
-  matches_count: number
+  expires_at?: string
 }
 
 export interface User {
@@ -75,14 +81,14 @@ export interface Match {
 }
 
 export interface DashboardStats {
-  total_users: number
-  active_users_7d: number
-  total_requests: number
-  active_requests: number
-  wa_jobs_today: number
-  matches_created: number
-  queue_backlog: number
-  system_health: 'healthy' | 'degraded' | 'down'
+  users: { total: number; active_7d: number; active_30d: number; telegram: number; whatsapp: number; profile_completed: number }
+  jobs: { scraped_today: number; processed: number; rejected_haiku: number; rejected_batch: number; notified: number; queue_backlog: number }
+  requests: { total: number; active: number }
+  matches: { total: number; connections: number }
+  ai: { cost_today: number; cost_saved: number }
+  messaging: { sent_today: number; failed_today: number }
+  opportunities: { active: number }
+  timestamp: string
 }
 
 export interface ActivityLog {
@@ -91,4 +97,5 @@ export interface ActivityLog {
   description: string
   timestamp: string
   user_id?: string
+  metadata?: Record<string, any>
 }

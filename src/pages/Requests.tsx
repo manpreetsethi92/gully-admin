@@ -4,7 +4,7 @@ import DataTable from '../components/DataTable'
 import { Target, Clock, CheckCircle } from 'lucide-react'
 import { fetchRequests } from '../utils/api'
 import { Request } from '../types'
-import { formatDate, formatRelativeTime, truncate } from '../utils/format'
+import { formatRelativeTime, truncate } from '../utils/format'
 import { getStatusColor } from '../utils/colors'
 
 export default function Requests() {
@@ -19,12 +19,12 @@ export default function Requests() {
   const loadRequests = async () => {
     try {
       const data = await fetchRequests(100, 0)
-      const reqs = Array.isArray(data.requests) ? data.requests : data
+      const reqs: Request[] = Array.isArray(data.requests) ? data.requests : data
       setRequests(reqs)
       setStats({
         total: reqs.length,
-        active: reqs.filter(r => r.status === 'active' || r.status === 'matching').length,
-        completed: reqs.filter(r => r.status === 'completed').length,
+        active: reqs.filter((r: Request) => r.status === 'active' || r.status === 'matching').length,
+        completed: reqs.filter((r: Request) => r.status === 'completed').length,
       })
     } catch (error) {
       console.error('Failed to load requests:', error)
@@ -37,7 +37,7 @@ export default function Requests() {
     { key: 'title' as const, label: 'Title', render: (val: string) => <span className="font-medium">{truncate(val, 50)}</span> },
     { key: 'category' as const, label: 'Category', render: (val: string) => <span className="text-sm text-gray-400">{val}</span> },
     { key: 'location' as const, label: 'Location', render: (val?: string) => <span>{val || '—'}</span> },
-    { key: 'budget' as const, label: 'Budget', render: (val?: string) => <span>{val || '—'}</span> },
+    { key: 'budget_display' as const, label: 'Budget', render: (val?: string) => <span>{val || '—'}</span> },
     { key: 'status' as const, label: 'Status', render: (val: string) => (
       <span className={`px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(val)}`}>{val}</span>
     ) },

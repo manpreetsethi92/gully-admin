@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react'
 import StatCard from '../components/StatCard'
 import DataTable from '../components/DataTable'
-import { Zap, Users, Target, TrendingUp, Eye } from 'lucide-react'
+import { Zap, Users, Target, TrendingUp } from 'lucide-react'
 import { fetchWAGroupJobs } from '../utils/api'
 import { WAGroupJob } from '../types'
-import { formatDate, formatPhone, truncate, formatRelativeTime } from '../utils/format'
+import { formatPhone, truncate, formatRelativeTime } from '../utils/format'
 import { getStatusColor, getUrgencyColor } from '../utils/colors'
 
 export default function WAGroupJobs() {

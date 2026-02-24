@@ -7,19 +7,18 @@ const api = axios.create({
   timeout: 10000,
 })
 
+export const fetchDashboardStats = async () => {
+  const response = await api.get('/admin/dashboard/overview')
+  return response.data
+}
+
 export const fetchWAGroupJobs = async (filters?: any) => {
   const params = new URLSearchParams()
   if (filters?.status) params.append('status', filters.status)
   if (filters?.group_name) params.append('group_name', filters.group_name)
   if (filters?.limit) params.append('limit', filters.limit)
   if (filters?.skip) params.append('skip', filters.skip)
-  
   const response = await api.get(`/wa-group/jobs?${params}`)
-  return response.data
-}
-
-export const fetchDashboardStats = async () => {
-  const response = await api.get('/admin/dashboard/overview')
   return response.data
 }
 
@@ -27,9 +26,8 @@ export const fetchRequests = async (limit = 50, skip = 0) => {
   const response = await api.get(`/admin/dashboard/requests?limit=${limit}&skip=${skip}`)
   return response.data
 }
-
 export const fetchMatches = async (limit = 50, skip = 0) => {
-  const response = await api.get(`/admin/dashboard/matches?limit=${limit}&skip=${skip}`)
+  const response = await api.get(`/admin/matches?limit=${limit}&skip=${skip}`)
   return response.data
 }
 
@@ -38,8 +36,32 @@ export const fetchUsers = async (limit = 50, skip = 0) => {
   return response.data
 }
 
-export const fetchGrowthMetrics = async () => {
-  const response = await api.get('/admin/dashboard/growth')
+export const fetchGrowthDaily = async () => {
+  const response = await api.get('/admin/analytics/growth')
+  return response.data
+}
+
+export const fetchFunnel = async () => {
+  const response = await api.get('/admin/analytics/funnel')
+  return response.data
+}
+
+export const fetchJobQueueStats = async () => {
+  const response = await api.get('/admin/job-queue/stats')
+  return response.data
+}
+
+export const fetchBlastStats = async () => {
+  const response = await api.get('/admin/blast/stats')
+  return response.data
+}
+
+export const fetchBlastToday = async () => {
+  const response = await api.get('/admin/blast/today')
+  return response.data
+}
+export const fetchActivityLog = async (limit = 50) => {
+  const response = await api.get(`/admin/activity?limit=${limit}`)
   return response.data
 }
 
