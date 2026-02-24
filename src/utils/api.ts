@@ -70,4 +70,34 @@ export const triggerWAJobMatching = async (jobId: string) => {
   return response.data
 }
 
+export const fetchAICosts = async (days = 30) => {
+  const response = await api.get(`/admin/dashboard/ai-costs?days=${days}`)
+  return response.data
+}
+
+export const fetchOutreachDashboard = async () => {
+  const response = await api.get('/passive/outreach-dashboard')
+  return response.data
+}
+
+export const markOutreachSent = async (outreachId: string) => {
+  const response = await api.post(`/passive/outreach/${outreachId}/mark-sent`)
+  return response.data
+}
+
+export const markOutreachReplied = async (outreachId: string) => {
+  const response = await api.post(`/passive/outreach/${outreachId}/mark-replied`)
+  return response.data
+}
+
+export const fetchConnections = async (limit = 50) => {
+  const response = await api.get(`/admin/dashboard/connections?limit=${limit}`)
+  return response.data
+}
+
+export const fetchOpportunities = async (limit = 50) => {
+  const response = await api.get(`/admin/dashboard/opportunities?limit=${limit}`)
+  return response.data
+}
+
 export default api

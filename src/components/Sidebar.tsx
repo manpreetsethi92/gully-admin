@@ -1,7 +1,8 @@
 import { Link, useLocation } from 'react-router-dom'
 import { 
   LayoutDashboard, FileText, Zap, Users, Target, Link as LinkIcon, 
-  MessageSquare, TrendingUp, ActivitySquare, ChevronLeft, X 
+  MessageSquare, TrendingUp, ActivitySquare, ChevronLeft, X,
+  Bot, Send, Handshake, Briefcase
 } from 'lucide-react'
 
 const navItems = [
@@ -10,8 +11,12 @@ const navItems = [
   { id: 'jobs', label: 'Job Pipeline', icon: FileText, href: '/jobs' },
   { id: 'requests', label: 'Requests', icon: Target, href: '/requests' },
   { id: 'matches', label: 'Matches', icon: LinkIcon, href: '/matches' },
+  { id: 'connections', label: 'Connections', icon: Handshake, href: '/connections' },
+  { id: 'opportunities', label: 'Opportunities', icon: Briefcase, href: '/opportunities' },
   { id: 'users', label: 'Users', icon: Users, href: '/users' },
+  { id: 'outreach', label: 'Outreach Queue', icon: Send, href: '/outreach' },
   { id: 'messaging', label: 'Messaging', icon: MessageSquare, href: '/messaging' },
+  { id: 'ai-costs', label: 'AI Costs', icon: Bot, href: '/ai-costs' },
   { id: 'growth', label: 'Growth', icon: TrendingUp, href: '/growth' },
   { id: 'activity', label: 'Activity', icon: ActivitySquare, href: '/activity' },
 ]

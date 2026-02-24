@@ -10,6 +10,10 @@ import Users from './pages/Users'
 import Messaging from './pages/Messaging'
 import Growth from './pages/Growth'
 import ActivityLog from './pages/ActivityLog'
+import AICosts from './pages/AICosts'
+import OutreachQueue from './pages/OutreachQueue'
+import Connections from './pages/Connections'
+import Opportunities from './pages/Opportunities'
 import Login from './pages/Login'
 
 const SESSION_KEY = 'titlii_admin_auth'
@@ -55,6 +59,10 @@ function App() {
           <Route path="/messaging" element={<Messaging />} />
           <Route path="/growth" element={<Growth />} />
           <Route path="/activity" element={<ActivityLog />} />
+          <Route path="/ai-costs" element={<AICosts />} />
+          <Route path="/outreach" element={<OutreachQueue />} />
+          <Route path="/connections" element={<Connections />} />
+          <Route path="/opportunities" element={<Opportunities />} />
           <Route path="*" element={<Navigate to="/" />} />
         </Route>
       </Routes>
