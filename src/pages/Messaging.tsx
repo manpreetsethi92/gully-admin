@@ -1,118 +1,157 @@
 import { useEffect, useState } from 'react'
 import StatCard from '../components/StatCard'
-import DataTable from '../components/DataTable'
-import { CheckCircle, AlertCircle, Users, TrendingUp, Send } from 'lucide-react'
-import { fetchBlastStats, fetchBlastToday } from '../utils/api'
+import ErrorState from '../components/ErrorState'
+import { CheckCircle, AlertCircle, Users, TrendingUp, Send, RefreshCw } from 'lucide-react'
+import { fetchBlastStats, fetchBlastContacts } from '../utils/api'
 import { formatRelativeTime, formatPhone } from '../utils/format'
 
 interface BlastStats {
+  total_contacts?: number
   total_sent: number
   signed_up: number
   not_signed_up: number
   conversion_rate: number
-  recent_blasts: Array<{ phone: string; name?: string; sent_at: string; signed_up: boolean }>
 }
 
-interface BlastToday {
-  users: Array<{ phone: string; name?: string; status?: string }>
-  outreach: Array<{ phone: string; sent_at?: string; status?: string }>
-  total: number
+interface BlastContact {
+  phone: string
+  name?: string
+  source_group?: string
+  signed_up?: boolean
+  sent?: boolean
+  sent_at?: string
 }
 
 export default function Messaging() {
-  const [blastStats, setBlastStats] = useState<BlastStats | null>(null)
-  const [todayData, setTodayData] = useState<BlastToday | null>(null)
+  const [stats, setStats] = useState<BlastStats | null>(null)
+  const [contacts, setContacts] = useState<BlastContact[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [filterGroup, setFilterGroup] = useState('')
 
-  useEffect(() => {
-    const load = async () => {
-      try {
-        const [statsRes, todayRes] = await Promise.all([fetchBlastStats(), fetchBlastToday()])
-        setBlastStats(statsRes)
-        setTodayData(todayRes)
-      } catch (err) {
-        console.error('Failed to load messaging data:', err)
-      } finally {
-        setLoading(false)
-      }
+  const load = async () => {
+    setLoading(true)
+    setError(null)
+    try {
+      const [statsRes, contactsRes] = await Promise.all([
+        fetchBlastStats().catch(() => null),
+        fetchBlastContacts(1000).catch(() => ({ contacts: [] })),
+      ])
+      setStats(statsRes)
+      const list = Array.isArray(contactsRes?.contacts) ? contactsRes.contacts : Array.isArray(contactsRes) ? contactsRes : []
+      setContacts(list)
+    } catch (err: any) {
+      setError(err.message || 'Failed to load messaging data')
+    } finally {
+      setLoading(false)
     }
-    load()
-  }, [])
+  }
+
+  useEffect(() => { load() }, [])
+
   if (loading) return <div className="flex items-center justify-center h-full text-gray-400">Loading messaging data...</div>
+  if (error) return <ErrorState message={error} onRetry={load} />
 
-  const stats = blastStats || { total_sent: 0, signed_up: 0, not_signed_up: 0, conversion_rate: 0, recent_blasts: [] }
-
-  const recentColumns = [
-    { key: 'phone' as const, label: 'Phone', render: (val: string) => <span className="text-sm font-mono">{formatPhone(val)}</span> },
-    { key: 'name' as const, label: 'Name', render: (val?: string) => <span className="text-sm">{val || '—'}</span> },
-    { key: 'signed_up' as const, label: 'Converted', render: (val: boolean) => (
-      <span className={`px-3 py-1 rounded-full text-xs font-medium border ${val ? 'bg-green-500/20 text-green-400 border-green-500/30' : 'bg-gray-500/20 text-gray-400 border-gray-500/30'}`}>
-        {val ? 'Yes' : 'No'}
-      </span>
-    ) },
-    { key: 'sent_at' as const, label: 'Sent', render: (val: string) => <span className="text-sm text-gray-400">{formatRelativeTime(val)}</span> },
-  ]
+  const s = stats || { total_contacts: 0, total_sent: 0, signed_up: 0, not_signed_up: 0, conversion_rate: 0 }
+  const sourceGroups = Array.from(new Set(contacts.map(c => c.source_group).filter(Boolean))) as string[]
+  const filtered = filterGroup ? contacts.filter(c => c.source_group === filterGroup) : contacts
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold">Messaging</h1>
-        <p className="text-gray-400 text-sm mt-1">WhatsApp blast outreach and conversion tracking</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold">Messaging & Blast</h1>
+          <p className="text-gray-400 text-sm mt-1">WhatsApp blast outreach and conversion tracking</p>
+        </div>
+        <button onClick={load} className="p-2 hover:bg-white/10 rounded-lg transition-colors">
+          <RefreshCw size={20} className={loading ? 'animate-spin' : ''} />
+        </button>
       </div>
 
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-        <StatCard label="Total Sent" value={stats.total_sent} icon={<Send size={20} />} index={0} />
-        <StatCard label="Signed Up" value={stats.signed_up} icon={<CheckCircle size={20} />} index={1} />
-        <StatCard label="Not Signed Up" value={stats.not_signed_up} icon={<AlertCircle size={20} />} index={4} />
-        <StatCard label="Conversion Rate" value={`${stats.conversion_rate}%`} icon={<TrendingUp size={20} />} index={2} />
-        <StatCard label="Today's Outreach" value={todayData?.total || 0} icon={<Users size={20} />} index={3} />
+        <StatCard label="Total Contacts" value={s.total_contacts || contacts.length} icon={<Users size={20} />} index={0} />
+        <StatCard label="Total Sent" value={s.total_sent} icon={<Send size={20} />} index={5} />
+        <StatCard label="Signed Up" value={s.signed_up} icon={<CheckCircle size={20} />} index={1} />
+        <StatCard label="Not Signed Up" value={s.not_signed_up} icon={<AlertCircle size={20} />} index={4} />
+        <StatCard label="Conversion Rate" value={`${s.conversion_rate}%`} icon={<TrendingUp size={20} />} index={2} />
       </div>
-      {/* Recent Blasts Table */}
-      <div className="bg-dark-surface border border-dark-border rounded-lg p-6">
-        <h2 className="text-lg font-semibold mb-4">Recent Blasts</h2>
-        {stats.recent_blasts.length > 0 ? (
-          <DataTable
-            columns={recentColumns}
-            data={stats.recent_blasts}
-            loading={false}
-            rowKey="phone"
-          />
+
+      {/* Filter */}
+      {sourceGroups.length > 0 && (
+        <div className="bg-dark-surface border border-dark-border rounded-lg p-4">
+          <label className="text-sm text-gray-400 block mb-2">Filter by Source Group</label>
+          <select
+            value={filterGroup}
+            onChange={(e) => setFilterGroup(e.target.value)}
+            className="bg-dark-bg border border-dark-border rounded px-3 py-2 text-sm"
+          >
+            <option value="">All Groups ({contacts.length})</option>
+            {sourceGroups.map(g => <option key={g} value={g}>{g}</option>)}
+          </select>
+        </div>
+      )}
+
+      {/* Contacts Table */}
+      <div className="bg-dark-surface border border-dark-border rounded-lg overflow-hidden">
+        <div className="px-4 py-3 border-b border-dark-border flex justify-between items-center">
+          <span className="font-semibold">Contacts ({filtered.length})</span>
+        </div>
+        {filtered.length > 0 ? (
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead className="bg-dark-bg border-b border-dark-border">
+                <tr>
+                  <th className="px-4 py-3 text-left text-sm font-medium text-gray-400">Name</th>
+                  <th className="px-4 py-3 text-left text-sm font-medium text-gray-400">Phone</th>
+                  <th className="px-4 py-3 text-left text-sm font-medium text-gray-400">Source</th>
+                  <th className="px-4 py-3 text-left text-sm font-medium text-gray-400">Status</th>
+                  <th className="px-4 py-3 text-left text-sm font-medium text-gray-400">Sent</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-dark-border">
+                {filtered.slice(0, 100).map((c, i) => (
+                  <tr key={c.phone + i} className="hover:bg-white/5">
+                    <td className="px-4 py-3 text-sm font-medium">{c.name || '—'}</td>
+                    <td className="px-4 py-3 text-sm font-mono text-gray-400">{formatPhone(c.phone)}</td>
+                    <td className="px-4 py-3 text-sm text-gray-400">{c.source_group || '—'}</td>
+                    <td className="px-4 py-3">
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium border ${
+                        c.signed_up ? 'bg-green-500/20 text-green-400 border-green-500/30' : 
+                        c.sent ? 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30' : 
+                        'bg-gray-500/20 text-gray-400 border-gray-500/30'
+                      }`}>
+                        {c.signed_up ? 'Signed Up' : c.sent ? 'Sent' : 'Pending'}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 text-sm text-gray-400">{c.sent_at ? formatRelativeTime(c.sent_at) : '—'}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            {filtered.length > 100 && (
+              <div className="px-4 py-3 text-center text-sm text-gray-500 border-t border-dark-border">
+                Showing 100 of {filtered.length} contacts
+              </div>
+            )}
+          </div>
         ) : (
-          <p className="text-gray-500 text-center py-4">No blast history yet</p>
+          <div className="p-8 text-center text-gray-500">No contacts found</div>
         )}
       </div>
 
       {/* Channel Status */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="bg-dark-surface border border-dark-border rounded-lg p-6">
-          <h2 className="text-lg font-semibold mb-4">Channel Status</h2>
-          <div className="space-y-4">
-            <div className="flex justify-between items-center">
-              <span className="text-gray-400">WhatsApp Business API</span>
-              <span className="text-green-400">● Connected</span>
-            </div>
-            <div className="flex justify-between items-center">
-              <span className="text-gray-400">Twilio</span>
-              <span className="text-green-400">● Active</span>
-            </div>
+      <div className="bg-dark-surface border border-dark-border rounded-lg p-6">
+        <h2 className="text-lg font-semibold mb-4">Channel Status</h2>
+        <div className="space-y-4">
+          <div className="flex justify-between items-center">
+            <span className="text-gray-400">WhatsApp Business API</span>
+            <span className="text-green-400">Connected</span>
           </div>
-        </div>
-
-        <div className="bg-dark-surface border border-dark-border rounded-lg p-6">
-          <h2 className="text-lg font-semibold mb-4">Today's Outreach</h2>
-          {todayData && todayData.outreach.length > 0 ? (
-            <div className="space-y-2 max-h-48 overflow-y-auto">
-              {todayData.outreach.map((o, idx) => (
-                <div key={idx} className="flex justify-between text-sm p-2 rounded bg-dark-bg">
-                  <span className="font-mono">{formatPhone(o.phone)}</span>
-                  <span className={`text-xs px-2 py-0.5 rounded ${o.status === 'sent' ? 'text-green-400' : 'text-gray-400'}`}>{o.status || 'queued'}</span>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <p className="text-gray-500 text-center py-4">No outreach today</p>
-          )}
+          <div className="flex justify-between items-center">
+            <span className="text-gray-400">Twilio</span>
+            <span className="text-green-400">Active</span>
+          </div>
         </div>
       </div>
     </div>

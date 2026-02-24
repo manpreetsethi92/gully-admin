@@ -100,4 +100,19 @@ export const fetchOpportunities = async (limit = 50) => {
   return response.data
 }
 
+export const fetchBlastContacts = async (limit = 1000) => {
+  const response = await api.get(`/admin/blast/contacts?limit=${limit}`)
+  return response.data
+}
+
+export const sendBlastMessages = async (phones: string[], message: string) => {
+  const response = await api.post('/admin/blast/send', { phones, message })
+  return response.data
+}
+
+export const fetchHealthStatus = async () => {
+  const response = await api.get('/admin/dashboard/health')
+  return response.data
+}
+
 export default api
