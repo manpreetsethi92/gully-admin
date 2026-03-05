@@ -14,6 +14,7 @@ import AICosts from './pages/AICosts'
 import OutreachQueue from './pages/OutreachQueue'
 import Connections from './pages/Connections'
 import Opportunities from './pages/Opportunities'
+import MatchAnalytics from './pages/MatchAnalytics'
 import Login from './pages/Login'
 
 const SESSION_KEY = 'titlii_admin_auth'
@@ -63,6 +64,7 @@ function App() {
           <Route path="/outreach" element={<OutreachQueue />} />
           <Route path="/connections" element={<Connections />} />
           <Route path="/opportunities" element={<Opportunities />} />
+          <Route path="/match-analytics" element={<MatchAnalytics />} />
           <Route path="*" element={<Navigate to="/" />} />
         </Route>
       </Routes>

@@ -2,7 +2,7 @@ import { Link, useLocation } from 'react-router-dom'
 import { 
   LayoutDashboard, FileText, Zap, Users, Target, Link as LinkIcon, 
   MessageSquare, TrendingUp, ActivitySquare, ChevronLeft, X,
-  Bot, Send, Handshake, Briefcase
+  Bot, Send, Handshake, Briefcase, BarChart2
 } from 'lucide-react'
 
 const navItems = [
@@ -17,6 +17,7 @@ const navItems = [
   { id: 'outreach', label: 'Outreach Queue', icon: Send, href: '/outreach' },
   { id: 'messaging', label: 'Messaging', icon: MessageSquare, href: '/messaging' },
   { id: 'ai-costs', label: 'AI Costs', icon: Bot, href: '/ai-costs' },
+  { id: 'match-analytics', label: 'Match Analytics', icon: BarChart2, href: '/match-analytics' },
   { id: 'growth', label: 'Growth', icon: TrendingUp, href: '/growth' },
   { id: 'activity', label: 'Activity', icon: ActivitySquare, href: '/activity' },
 ]
