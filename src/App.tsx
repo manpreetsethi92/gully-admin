@@ -15,6 +15,9 @@ import OutreachQueue from './pages/OutreachQueue'
 import Connections from './pages/Connections'
 import Opportunities from './pages/Opportunities'
 import MatchAnalytics from './pages/MatchAnalytics'
+import SuccessStories from './pages/SuccessStories'
+import CategoryCoverage from './pages/CategoryCoverage'
+import RevenueAttribution from './pages/RevenueAttribution'
 import Login from './pages/Login'
 
 const SESSION_KEY = 'titlii_admin_auth'
@@ -65,6 +68,9 @@ function App() {
           <Route path="/connections" element={<Connections />} />
           <Route path="/opportunities" element={<Opportunities />} />
           <Route path="/match-analytics" element={<MatchAnalytics />} />
+          <Route path="/success-stories" element={<SuccessStories />} />
+          <Route path="/category-coverage" element={<CategoryCoverage />} />
+          <Route path="/revenue" element={<RevenueAttribution />} />
           <Route path="*" element={<Navigate to="/" />} />
         </Route>
       </Routes>

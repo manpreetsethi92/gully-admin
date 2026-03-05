@@ -115,4 +115,24 @@ export const fetchHealthStatus = async () => {
   return response.data
 }
 
+export const fetchSuccessStories = async () => {
+  const response = await api.get('/admin/success-stories')
+  return response.data
+}
+
+export const approveSuccessStory = async (matchId: string) => {
+  const response = await api.post(`/admin/success-stories/${matchId}/approve`)
+  return response.data
+}
+
+export const fetchCategoryCoverage = async () => {
+  const response = await api.get('/admin/category-coverage')
+  return response.data
+}
+
+export const fetchRevenueAttribution = async () => {
+  const response = await api.get('/admin/revenue-attribution')
+  return response.data
+}
+
 export default api
