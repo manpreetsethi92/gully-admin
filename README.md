@@ -1,6 +1,6 @@
-# Titlii Admin Dashboard
+# Giggy Admin Dashboard
 
-A professional React + TypeScript admin dashboard for managing the titlii.social platform. Built with Vite, Tailwind CSS, and modern web technologies.
+A professional React + TypeScript admin dashboard for managing the getgiggy.ai platform. Built with Vite, Tailwind CSS, and modern web technologies.
 
 ## Features
 
@@ -164,7 +164,7 @@ colors: {
     border: 'rgba(255,255,255,0.1)',
   },
   accent: {
-    DEFAULT: '#E50914',  // Titlii brand red
+    DEFAULT: '#E50914',  // Giggy brand red
   }
 }
 ```
@@ -199,4 +199,4 @@ MIT
 
 ## Support
 
-For issues or questions, contact the Titlii team.
+For issues or questions, contact the Giggy team.

@@ -20,7 +20,7 @@ import CategoryCoverage from './pages/CategoryCoverage'
 import RevenueAttribution from './pages/RevenueAttribution'
 import Login from './pages/Login'
 
-const SESSION_KEY = 'titlii_admin_auth'
+const SESSION_KEY = 'giggy_admin_auth'
 
 function ProtectedLayout({ onLogout }: { onLogout: () => void }) {
   return (

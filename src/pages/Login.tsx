@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Zap, Eye, EyeOff } from 'lucide-react'
 
-const ADMIN_PASSWORD = 'titlii2026'
+const ADMIN_PASSWORD = 'giggy2026'
 
 export default function Login({ onLogin }: { onLogin: () => void }) {
   const [password, setPassword] = useState('')
@@ -25,7 +25,7 @@ export default function Login({ onLogin }: { onLogin: () => void }) {
           <div className="w-16 h-16 rounded-2xl bg-accent/20 flex items-center justify-center mx-auto mb-4">
             <Zap size={32} className="text-accent" />
           </div>
-          <h1 className="text-2xl font-bold text-white">TITLII Admin</h1>
+          <h1 className="text-2xl font-bold text-white">GIGGY Admin</h1>
           <p className="text-gray-400 text-sm mt-1">Enter your admin password to continue</p>
         </div>
         <form onSubmit={handleSubmit} className="space-y-4">
