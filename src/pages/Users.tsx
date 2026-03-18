@@ -17,7 +17,7 @@ export default function Users() {
 
   const loadUsers = async () => {
     try {
-      const data = await fetchUsers(100, 0)
+      const data = await fetchUsers(200, 1)
       const usrs = Array.isArray(data.users) ? data.users : data
       setUsers(usrs)
       setStats({

@@ -26,13 +26,13 @@ export const fetchRequests = async (limit = 200, page = 1) => {
   const response = await api.get(`/admin/dashboard/requests?limit=${limit}&page=${page}`)
   return response.data
 }
-export const fetchMatches = async (limit = 50, skip = 0) => {
-  const response = await api.get(`/admin/matches?limit=${limit}&skip=${skip}`)
+export const fetchMatches = async (limit = 500) => {
+  const response = await api.get(`/admin/matches?limit=${limit}`)
   return response.data
 }
 
-export const fetchUsers = async (limit = 50, skip = 0) => {
-  const response = await api.get(`/admin/dashboard/users?limit=${limit}&skip=${skip}`)
+export const fetchUsers = async (limit = 200, page = 1) => {
+  const response = await api.get(`/admin/dashboard/users?limit=${limit}&page=${page}`)
   return response.data
 }
 

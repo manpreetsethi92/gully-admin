@@ -73,10 +73,12 @@ export interface User {
 export interface Match {
   id: string
   request_id: string
-  user_id: string
-  score: number
-  reasons: string[]
-  status: 'pending' | 'notified' | 'converted' | 'declined' | 'ghosted'
+  matched_user_id: string
+  match_score: number
+  match_reason?: string
+  match_type?: string
+  status: string
+  track?: string
   created_at: string
 }
 

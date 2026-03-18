@@ -18,7 +18,7 @@ export default function Matches() {
 
   const loadMatches = async () => {
     try {
-      const data = await fetchMatches(100, 0)
+      const data = await fetchMatches(500)
       const mtchs: Match[] = Array.isArray(data.matches) ? data.matches : data
       setMatches(mtchs)
       setStats({
@@ -34,9 +34,9 @@ export default function Matches() {
   }
 
   const columns = [
-    { key: 'user_id' as const, label: 'User', render: (val: string) => <span className="text-sm">{val.slice(0, 20)}</span> },
-    { key: 'score' as const, label: 'Score', render: (val: number) => <span className="font-semibold">{Math.round(val)}%</span> },
-    { key: 'request_id' as const, label: 'Request', render: (val: string) => <span className="text-sm text-gray-400">{val.slice(0, 20)}</span> },
+    { key: 'matched_user_id' as const, label: 'User', render: (val: string) => <span className="text-sm">{val?.slice(0, 20) || '—'}</span> },
+    { key: 'match_score' as const, label: 'Score', render: (val: number) => <span className="font-semibold">{val != null ? Math.round(val) + '%' : '—'}</span> },
+    { key: 'request_id' as const, label: 'Request', render: (val: string) => <span className="text-sm text-gray-400">{val?.slice(0, 20) || '—'}</span> },
     { key: 'status' as const, label: 'Status', render: (val: string) => (
       <span className={`px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(val)}`}>{val}</span>
     ) },
