@@ -22,8 +22,8 @@ export const fetchWAGroupJobs = async (filters?: any) => {
   return response.data
 }
 
-export const fetchRequests = async (limit = 50, skip = 0) => {
-  const response = await api.get(`/admin/dashboard/requests?limit=${limit}&skip=${skip}`)
+export const fetchRequests = async (limit = 200, page = 1) => {
+  const response = await api.get(`/admin/dashboard/requests?limit=${limit}&page=${page}`)
   return response.data
 }
 export const fetchMatches = async (limit = 50, skip = 0) => {

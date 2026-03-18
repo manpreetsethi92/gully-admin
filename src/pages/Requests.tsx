@@ -18,13 +18,26 @@ export default function Requests() {
 
   const loadRequests = async () => {
     try {
-      const data = await fetchRequests(100, 0)
+      const data = await fetchRequests(200, 1)
       const reqs: Request[] = Array.isArray(data.requests) ? data.requests : data
-      setRequests(reqs)
+      // Compute budget_display client-side since it's not stored in DB
+      const enriched = reqs.map((r: Request) => ({
+        ...r,
+        budget_display: r.budget_display || (
+          r.budget_min != null && r.budget_max != null
+            ? `$${r.budget_min}–$${r.budget_max}`
+            : r.budget_min != null
+            ? `From $${r.budget_min}`
+            : r.budget_max != null
+            ? `Up to $${r.budget_max}`
+            : undefined
+        ),
+      }))
+      setRequests(enriched)
       setStats({
-        total: reqs.length,
-        active: reqs.filter((r: Request) => r.status === 'active' || r.status === 'matching').length,
-        completed: reqs.filter((r: Request) => r.status === 'completed').length,
+        total: enriched.length,
+        active: enriched.filter((r: Request) => r.status === 'active' || r.status === 'matching').length,
+        completed: enriched.filter((r: Request) => r.status === 'completed').length,
       })
     } catch (error) {
       console.error('Failed to load requests:', error)
