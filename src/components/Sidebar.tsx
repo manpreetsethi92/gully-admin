@@ -2,7 +2,8 @@ import { Link, useLocation } from 'react-router-dom'
 import { 
   LayoutDashboard, FileText, Zap, Users, Target, Link as LinkIcon, 
   MessageSquare, TrendingUp, ActivitySquare, ChevronLeft, X,
-  Bot, Send, Handshake, Briefcase, BarChart2, Star, MapPin, DollarSign
+  Bot, Send, Handshake, Briefcase, BarChart2, Star, MapPin, DollarSign,
+  Network, Megaphone, Radio, LineChart, Key
 } from 'lucide-react'
 
 const navItems = [
@@ -23,6 +24,12 @@ const navItems = [
   { id: 'revenue', label: 'Revenue', icon: DollarSign, href: '/revenue' },
   { id: 'growth', label: 'Growth', icon: TrendingUp, href: '/growth' },
   { id: 'activity', label: 'Activity', icon: ActivitySquare, href: '/activity' },
+  { id: 'intent-graph', label: 'Intent Graph', icon: Network, href: '/intent-graph' },
+  { id: 'ads', label: 'Ads & Campaigns', icon: Megaphone, href: '/ads' },
+  { id: 'social-listening', label: 'Social Listening', icon: Radio, href: '/social-listening' },
+  { id: 'rate-benchmarks', label: 'Rate Benchmarks', icon: TrendingUp, href: '/rate-benchmarks' },
+  { id: 'demand-forecasting', label: 'Demand Forecast', icon: LineChart, href: '/demand-forecasting' },
+  { id: 'enterprise-api', label: 'Enterprise API', icon: Key, href: '/enterprise-api' },
 ]
 
 interface SidebarProps {

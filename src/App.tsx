@@ -19,6 +19,12 @@ import SuccessStories from './pages/SuccessStories'
 import CategoryCoverage from './pages/CategoryCoverage'
 import RevenueAttribution from './pages/RevenueAttribution'
 import Login from './pages/Login'
+import IntentGraph from './pages/IntentGraph'
+import AdsCampaigns from './pages/AdsCampaigns'
+import SocialListening from './pages/SocialListening'
+import RateBenchmarks from './pages/RateBenchmarks'
+import DemandForecasting from './pages/DemandForecasting'
+import EnterpriseAPI from './pages/EnterpriseAPI'
 
 const SESSION_KEY = 'giggy_admin_auth'
 
@@ -71,6 +77,12 @@ function App() {
           <Route path="/success-stories" element={<SuccessStories />} />
           <Route path="/category-coverage" element={<CategoryCoverage />} />
           <Route path="/revenue" element={<RevenueAttribution />} />
+          <Route path="/intent-graph" element={<IntentGraph />} />
+          <Route path="/ads" element={<AdsCampaigns />} />
+          <Route path="/social-listening" element={<SocialListening />} />
+          <Route path="/rate-benchmarks" element={<RateBenchmarks />} />
+          <Route path="/demand-forecasting" element={<DemandForecasting />} />
+          <Route path="/enterprise-api" element={<EnterpriseAPI />} />
           <Route path="*" element={<Navigate to="/" />} />
         </Route>
       </Routes>
