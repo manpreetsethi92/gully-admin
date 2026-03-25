@@ -1,7 +1,14 @@
 import { useState } from 'react'
 import { Zap, Eye, EyeOff } from 'lucide-react'
 
-const ADMIN_PASSWORD = 'giggy2026'
+// SECURITY WARNING: Client-side password check is NOT secure!
+// This should be replaced with proper backend authentication.
+// For now, password is moved to environment variable.
+const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD || ''
+
+if (!ADMIN_PASSWORD) {
+  console.error('VITE_ADMIN_PASSWORD not set - admin login will not work')
+}
 
 export default function Login({ onLogin }: { onLogin: () => void }) {
   const [password, setPassword] = useState('')
