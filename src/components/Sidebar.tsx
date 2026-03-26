@@ -65,7 +65,7 @@ export default function Sidebar({ open, onToggle, mobileOpen, onMobileClose }: S
             <div className="w-10 h-10 rounded-lg bg-accent/20 flex items-center justify-center">
               <Zap size={24} className="text-accent" />
             </div>
-            {(open || mobileOpen) && <div className="font-bold text-lg">GIGGY</div>}
+            {(open || mobileOpen) && <div className="font-bold text-lg">TITLII</div>}
           </div>
           <button onClick={onMobileClose} className="md:hidden p-2 hover:bg-white/10 rounded-lg">
             <X size={20} />
@@ -102,7 +102,7 @@ export default function Sidebar({ open, onToggle, mobileOpen, onMobileClose }: S
         {/* Footer */}
         <div className="p-4 border-t border-dark-border">
           <div className={`text-xs text-gray-500 ${(open || mobileOpen) ? '' : 'text-center'}`}>
-            {(open || mobileOpen) ? 'Giggy Admin' : 'v1'}
+            {(open || mobileOpen) ? 'Titlii Admin' : 'v1'}
           </div>
         </div>
       </aside>
