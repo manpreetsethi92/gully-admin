@@ -141,11 +141,11 @@ export const fetchActiveCampaigns = async () => {
 }
 
 export const fetchCampaignPerformance = async () => {
-  return { impressions: 0, clicks: 0, conversions: 0, spend: 0 }
+  return { metrics: [] }
 }
 
 export const fetchAdRevenueDashboard = async () => {
-  return { revenue: 0, costs: 0, profit: 0 }
+  return { revenue: null }
 }
 
 export const fetchGigAdvances = async () => {
@@ -158,7 +158,7 @@ export const fetchAdvanceRepayment = async () => {
 
 // Demand Forecasting (placeholder stubs)
 export const fetchDemandForecast = async () => {
-  return { forecast: [], accuracy: 0 }
+  return { forecasts: [], accuracy: 0 }
 }
 
 export const fetchSeasonalTrends = async () => {
