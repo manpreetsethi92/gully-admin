@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Activity, Zap, TrendingUp, Clock } from 'lucide-react'
+import { Activity, Zap, Clock } from 'lucide-react'
 import StatCard from '../components/StatCard'
 import DataTable from '../components/DataTable'
 import { fetchLiveSignalFeed, fetchSignalConversionRate, fetchSignalConfidence, fetchUnfilledSignals } from '../utils/api'
@@ -71,11 +71,11 @@ export default function SocialListening() {
       setConfidenceData(processedConf)
       setUnfilledSignals(processedUnfilled)
 
-      const avgConf = processedSignals.length > 0 ? processedSignals.reduce((sum, s) => sum + s.confidence, 0) / processedSignals.length : 0
+      const avgConf = processedSignals.length > 0 ? processedSignals.reduce((sum: number, s: Signal) => sum + s.confidence, 0) / processedSignals.length : 0
 
       setStats({
         totalSignals: processedSignals.length,
-        processingRate: processedSignals.filter((s) => s.status === 'processing').length,
+        processingRate: processedSignals.filter((s: Signal) => s.status === 'processing').length,
         avgConfidence: parseFloat(avgConf.toFixed(2)),
       })
     } catch (error) {

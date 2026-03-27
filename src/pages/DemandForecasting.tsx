@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { TrendingUp, Calendar, Target, BarChart3 } from 'lucide-react'
+import { TrendingUp, Target, BarChart3 } from 'lucide-react'
 import StatCard from '../components/StatCard'
 import DataTable from '../components/DataTable'
 import { fetchDemandForecast, fetchSeasonalTrends, fetchForecastAccuracy } from '../utils/api'
@@ -59,8 +59,8 @@ export default function DemandForecasting() {
       setSeasonalTrends(processedSeasonal)
       setAccuracy(processedAccuracy)
 
-      const avgConf = processedForecast.length > 0 ? processedForecast.reduce((sum, f) => sum + f.confidence_level, 0) / processedForecast.length : 0
-      const trendingUp = processedForecast.filter((f) => f.trending_up).length
+      const avgConf = processedForecast.length > 0 ? processedForecast.reduce((sum: number, f: DemandForecast) => sum + f.confidence_level, 0) / processedForecast.length : 0
+      const trendingUp = processedForecast.filter((f: DemandForecast) => f.trending_up).length
 
       setStats({
         avgConfidence: parseFloat(avgConf.toFixed(1)),

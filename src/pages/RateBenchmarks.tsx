@@ -62,9 +62,9 @@ export default function RateBenchmarks() {
       setTrends(processedTrends)
       setAccuracy(processedAcc)
 
-      const uniqueSkills = new Set(processedBench.map((b) => b.skill)).size
-      const avgRate = processedBench.length > 0 ? processedBench.reduce((sum, b) => sum + b.avg_rate, 0) / processedBench.length : 0
-      const highDemand = processedBench.filter((b) => b.market_demand === 'high').length
+      const uniqueSkills = new Set(processedBench.map((b: RateBenchmark) => b.skill)).size
+      const avgRate = processedBench.length > 0 ? processedBench.reduce((sum: number, b: RateBenchmark) => sum + b.avg_rate, 0) / processedBench.length : 0
+      const highDemand = processedBench.filter((b: RateBenchmark) => b.market_demand === 'high').length
 
       setStats({
         totalSkills: uniqueSkills,

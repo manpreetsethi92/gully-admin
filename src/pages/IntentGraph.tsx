@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Network, Users, Zap, TrendingUp, Link as LinkIcon } from 'lucide-react'
+import { Network, Zap, Link as LinkIcon } from 'lucide-react'
 import StatCard from '../components/StatCard'
 import DataTable from '../components/DataTable'
 import { fetchIntentGraphNodes, fetchCollabEdges, fetchMicroTeams, fetchSkillAffinity, fetchTrustPropagation } from '../utils/api'
@@ -88,7 +88,7 @@ export default function IntentGraph() {
 
       const avgCIS =
         processedNodes.length > 0
-          ? processedNodes.reduce((sum, n) => sum + n.cis_score, 0) / processedNodes.length
+          ? processedNodes.reduce((sum: number, n: IntentNode) => sum + n.cis_score, 0) / processedNodes.length
           : 0
 
       setStats({

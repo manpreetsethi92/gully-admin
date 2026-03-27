@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Key, Building2, Activity, DollarSign, Copy, Trash2 } from 'lucide-react'
+import { Key, Building2, DollarSign, Copy } from 'lucide-react'
 import StatCard from '../components/StatCard'
 import DataTable from '../components/DataTable'
 import { fetchAPIKeys, fetchEnterpriseClients, fetchAPIUsageBilling } from '../utils/api'
@@ -66,8 +66,8 @@ export default function EnterpriseAPI() {
       setClients(processedClients)
       setUsageBilling(processedUsage)
 
-      const activeKeysCount = processedKeys.filter((k) => k.status === 'active').length
-      const totalRevenue = processedClients.reduce((sum, c) => sum + c.contract_value, 0)
+      const activeKeysCount = processedKeys.filter((k: APIKey) => k.status === 'active').length
+      const totalRevenue = processedClients.reduce((sum: number, c: EnterpriseClient) => sum + c.contract_value, 0)
 
       setStats({
         activeKeys: activeKeysCount,

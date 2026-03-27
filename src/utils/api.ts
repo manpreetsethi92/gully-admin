@@ -135,4 +135,102 @@ export const fetchRevenueAttribution = async () => {
   return response.data
 }
 
+// Ads & Campaigns (placeholder stubs for future features)
+export const fetchActiveCampaigns = async () => {
+  return { campaigns: [], total: 0 }
+}
+
+export const fetchCampaignPerformance = async () => {
+  return { impressions: 0, clicks: 0, conversions: 0, spend: 0 }
+}
+
+export const fetchAdRevenueDashboard = async () => {
+  return { revenue: 0, costs: 0, profit: 0 }
+}
+
+export const fetchGigAdvances = async () => {
+  return { advances: [], total_amount: 0 }
+}
+
+export const fetchAdvanceRepayment = async () => {
+  return { repayments: [], total_repaid: 0 }
+}
+
+// Demand Forecasting (placeholder stubs)
+export const fetchDemandForecast = async () => {
+  return { forecast: [], accuracy: 0 }
+}
+
+export const fetchSeasonalTrends = async () => {
+  return { trends: [] }
+}
+
+export const fetchForecastAccuracy = async () => {
+  return { accuracy: [] }
+}
+
+// Enterprise API (placeholder stubs)
+export const fetchAPIKeys = async () => {
+  return { keys: [] }
+}
+
+export const fetchEnterpriseClients = async () => {
+  return { clients: [] }
+}
+
+export const fetchAPIUsageBilling = async () => {
+  return { usage: [], billing: [] }
+}
+
+// Intent Graph (placeholder stubs)
+export const fetchIntentGraphNodes = async () => {
+  return { nodes: [] }
+}
+
+export const fetchCollabEdges = async () => {
+  return { edges: [] }
+}
+
+export const fetchMicroTeams = async () => {
+  return { teams: [] }
+}
+
+export const fetchSkillAffinity = async () => {
+  return { affinity: [] }
+}
+
+export const fetchTrustPropagation = async () => {
+  return { vouches: [] }
+}
+
+// Rate Benchmarks (placeholder stubs)
+export const fetchRateBenchmarks = async () => {
+  return { benchmarks: [] }
+}
+
+export const fetchRateTrends = async () => {
+  return { trends: [] }
+}
+
+export const fetchBenchmarkAccuracy = async () => {
+  return { accuracy: [] }
+}
+
+// Social Listening (placeholder stubs)
+export const fetchLiveSignalFeed = async () => {
+  return { signals: [] }
+}
+
+export const fetchSignalConversionRate = async () => {
+  return { metrics: null }
+}
+
+export const fetchSignalConfidence = async () => {
+  return { distribution: [] }
+}
+
+export const fetchUnfilledSignals = async () => {
+  return { unfilled: [] }
+}
+
 export default api

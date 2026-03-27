@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { TrendingUp, Users, DollarSign, Target, Zap } from 'lucide-react'
+import { TrendingUp, DollarSign, Target, Zap } from 'lucide-react'
 import StatCard from '../components/StatCard'
 import DataTable from '../components/DataTable'
 import { fetchActiveCampaigns, fetchCampaignPerformance, fetchAdRevenueDashboard, fetchGigAdvances, fetchAdvanceRepayment } from '../utils/api'
