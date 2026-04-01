@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from 'react'
-import { Users as UsersIcon, CheckCircle, Shield, ChevronRight, X, Github, Youtube, RefreshCw, MessageCircle } from 'lucide-react'
+import { ChevronRight, X, Github, Youtube, RefreshCw } from 'lucide-react'
 import { fetchUsers, fetchUserDetail } from '../utils/api'
 import { formatRelativeTime } from '../utils/format'
 

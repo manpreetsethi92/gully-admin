@@ -45,13 +45,7 @@ export const fetchUserDetail = async (userId: string) => {
   return response.data
 }
 
-export const fetchFabricUser = async (userId: string) => {
-  // Get fabric enrichment data for a user
-  const response = await api.get(`/admin/dashboard/users/${userId}/fabric`)
-  return response.data
-}
-
-
+export const fetchGrowthDaily = async () => {
   const response = await api.get('/admin/analytics/growth')
   return response.data
 }
