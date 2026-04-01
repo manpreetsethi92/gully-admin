@@ -149,6 +149,11 @@ export const fetchRevenueAttribution = async () => {
   return response.data
 }
 
+export const fetchUserMesh = async (userId: string) => {
+  const response = await api.get(`/admin/dashboard/users/${userId}/mesh`)
+  return response.data
+}
+
 // ── Intent Graph ─────────────────────────────────────────
 const fetchIntentGraphAll = async () => {
   const res = await api.get('/admin/intent-graph')

@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from 'react'
-import { ChevronRight, X, Github, Youtube, RefreshCw } from 'lucide-react'
-import { fetchUsers, fetchUserDetail } from '../utils/api'
+import { ChevronRight, X, Github, Youtube, RefreshCw, Zap } from 'lucide-react'
+import { fetchUsers, fetchUserDetail, fetchUserMesh } from '../utils/api'
 import { formatRelativeTime } from '../utils/format'
 
 interface User {
@@ -105,6 +105,7 @@ export default function Users() {
   const [loading, setLoading] = useState(true)
   const [selected, setSelected] = useState<UserDetail | null>(null)
   const [detailLoading, setDetailLoading] = useState(false)
+  const [mesh, setMesh] = useState<any>(null)
   const [stats, setStats] = useState({ total: 0, verified: 0, fabric: 0, oauth: 0 })
   const [search, setSearch] = useState('')
 
@@ -127,9 +128,12 @@ export default function Users() {
 
   const openDetail = async (userId: string) => {
     setDetailLoading(true)
+    setMesh(null)
     try {
       const data = await fetchUserDetail(userId)
       setSelected(data)
+      // Load mesh in background — don't block the panel
+      fetchUserMesh(userId).then(m => setMesh(m)).catch(() => {})
     } catch (e) { console.error(e) }
     finally { setDetailLoading(false) }
   }
@@ -385,6 +389,105 @@ export default function Users() {
                   ))}
                 </Section>
               )}
+
+              {/* Profile Intelligence / Mesh */}
+              <Section title="Profile Intelligence">
+                {!mesh ? (
+                  <p className="text-white/30 text-xs">Building mesh...</p>
+                ) : mesh.node ? (
+                  <>
+                    {/* Completeness score */}
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-white/50 text-xs">Profile Score</span>
+                      <span className={`text-lg font-bold ${
+                        (mesh.node.profile_completeness || 0) >= 70 ? 'text-green-400' :
+                        (mesh.node.profile_completeness || 0) >= 40 ? 'text-yellow-400' : 'text-red-400'
+                      }`}>{mesh.node.profile_completeness || 0}%</span>
+                    </div>
+                    {/* Completeness bar */}
+                    <div className="h-1.5 bg-white/10 rounded-full mb-3 overflow-hidden">
+                      <div className="h-full bg-gradient-to-r from-purple-500 to-blue-500 rounded-full"
+                        style={{ width: `${mesh.node.profile_completeness || 0}%` }} />
+                    </div>
+
+                    {/* Category weight bars */}
+                    {Object.entries(mesh.node.category_weights || {}).length > 0 && (
+                      <div className="space-y-1.5 mb-3">
+                        {Object.entries(mesh.node.category_weights as Record<string, number>)
+                          .sort(([,a],[,b]) => b - a).slice(0, 5)
+                          .map(([cat, weight]) => {
+                            const maxW = Math.max(...Object.values(mesh.node.category_weights as Record<string, number>))
+                            const pct = maxW > 0 ? Math.round((weight / maxW) * 100) : 0
+                            return (
+                              <div key={cat}>
+                                <div className="flex justify-between text-xs mb-0.5">
+                                  <span className="text-white/60 capitalize">{cat.replace(/_/g, ' ')}</span>
+                                  <span className="text-white/40">{weight.toFixed(1)}</span>
+                                </div>
+                                <div className="h-1 bg-white/10 rounded-full overflow-hidden">
+                                  <div className="h-full bg-purple-500 rounded-full" style={{ width: `${pct}%` }} />
+                                </div>
+                              </div>
+                            )
+                          })}
+                      </div>
+                    )}
+
+                    {/* Data sources used */}
+                    {(mesh.node.sources || []).length > 0 && (
+                      <div className="flex flex-wrap gap-1 mb-3">
+                        {(mesh.node.sources as string[]).map(s => (
+                          <Badge key={s} label={s.replace(/_/g, ' ')} color={
+                            s.includes('linkedin') ? 'blue' :
+                            s.includes('instagram') || s.includes('fabric') ? 'purple' :
+                            s.includes('github') ? 'gray' : 'green'
+                          } />
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Collab edges */}
+                    {(mesh.collab_edges || []).length > 0 && (
+                      <div>
+                        <p className="text-white/30 text-xs mb-1">Auto-paired with</p>
+                        {(mesh.collab_edges as any[]).slice(0, 3).map((edge: any, i: number) => (
+                          <div key={i} className="flex items-center justify-between text-xs py-0.5">
+                            <span className="text-white/60">{edge.other_user_name}</span>
+                            <Badge label={edge.category_b?.replace(/_/g, ' ') || 'complement'} color="blue" />
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Demand signals */}
+                    {(mesh.demand_signals || []).length > 0 && (
+                      <div className="mt-2 pt-2 border-t border-white/5">
+                        <p className="text-white/30 text-xs mb-1">Open demand for their skills</p>
+                        {(mesh.demand_signals as any[]).map((d: any, i: number) => (
+                          <div key={i} className="flex items-center justify-between text-xs">
+                            <span className="text-white/60 capitalize">{d.category?.replace(/_/g, ' ')}</span>
+                            <span className="text-green-400">{d.request_count} requests</span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    <p className="text-white/20 text-xs mt-2">
+                      Last rebuilt: {mesh.rebuilt_at ? formatRelativeTime(mesh.rebuilt_at) : 'never'}
+                    </p>
+                  </>
+                ) : (
+                  <div className="text-center py-2">
+                    <p className="text-white/30 text-xs mb-2">No mesh data yet</p>
+                    <button
+                      onClick={() => fetchUserMesh(selected.user.id).then(m => setMesh(m))}
+                      className="flex items-center gap-1 mx-auto px-3 py-1 bg-purple-500/20 text-purple-400 rounded text-xs hover:bg-purple-500/30"
+                    >
+                      <Zap size={10} /> Build Now
+                    </button>
+                  </div>
+                )}
+              </Section>
 
               {/* Raw ID */}
               <div className="mt-4 p-3 bg-white/5 rounded-xl">
