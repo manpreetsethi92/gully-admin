@@ -1,9 +1,6 @@
 import { useState, useEffect } from 'react'
 import { TrendingUp, TrendingDown, Minus, Target, Zap, Link as LinkIcon, Users, RefreshCw } from 'lucide-react'
-import axios from 'axios'
-
-const API_BASE = import.meta.env.VITE_API_URL || 'https://titly-backend-production.up.railway.app/api'
-const api = axios.create({ baseURL: API_BASE, withCredentials: true })
+import api from '../utils/api'
 
 interface MatchQualityData {
   funnel: {
