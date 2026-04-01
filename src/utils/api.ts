@@ -3,6 +3,11 @@ import axios from 'axios'
 const API_BASE = import.meta.env.VITE_API_URL || 'https://api.trygully.com/api'
 const ADMIN_SECRET = import.meta.env.VITE_ADMIN_SECRET || 'gully-admin-secret-123'
 
+// Sanity check — ensure we never accidentally use the old Railway URL
+if (API_BASE.includes('railway.app') || API_BASE.includes('titly-backend')) {
+  console.error('WRONG API URL DETECTED — should be api.trygully.com')
+}
+
 const api = axios.create({
   baseURL: API_BASE,
   timeout: 10000,
@@ -144,102 +149,109 @@ export const fetchRevenueAttribution = async () => {
   return response.data
 }
 
-// Ads & Campaigns (placeholder stubs for future features)
-export const fetchActiveCampaigns = async () => {
-  return { campaigns: [], total: 0 }
+// ── Intent Graph ─────────────────────────────────────────
+const fetchIntentGraphAll = async () => {
+  const res = await api.get('/admin/intent-graph')
+  return res.data
 }
-
-export const fetchCampaignPerformance = async () => {
-  return { metrics: [] }
-}
-
-export const fetchAdRevenueDashboard = async () => {
-  return { revenue: null }
-}
-
-export const fetchGigAdvances = async () => {
-  return { advances: [], total_amount: 0 }
-}
-
-export const fetchAdvanceRepayment = async () => {
-  return { repayments: [], total_repaid: 0 }
-}
-
-// Demand Forecasting (placeholder stubs)
-export const fetchDemandForecast = async () => {
-  return { forecasts: [], accuracy: 0 }
-}
-
-export const fetchSeasonalTrends = async () => {
-  return { trends: [] }
-}
-
-export const fetchForecastAccuracy = async () => {
-  return { accuracy: [] }
-}
-
-// Enterprise API (placeholder stubs)
-export const fetchAPIKeys = async () => {
-  return { keys: [] }
-}
-
-export const fetchEnterpriseClients = async () => {
-  return { clients: [] }
-}
-
-export const fetchAPIUsageBilling = async () => {
-  return { usage: [], billing: [] }
-}
-
-// Intent Graph (placeholder stubs)
 export const fetchIntentGraphNodes = async () => {
-  return { nodes: [] }
+  const d = await fetchIntentGraphAll(); return { nodes: d.nodes || [] }
 }
-
 export const fetchCollabEdges = async () => {
-  return { edges: [] }
+  const d = await fetchIntentGraphAll(); return { edges: d.edges || [] }
 }
-
 export const fetchMicroTeams = async () => {
-  return { teams: [] }
+  const d = await fetchIntentGraphAll(); return { teams: d.teams || [] }
 }
-
 export const fetchSkillAffinity = async () => {
-  return { affinity: [] }
+  const d = await fetchIntentGraphAll(); return { affinity: d.affinity || [] }
 }
-
 export const fetchTrustPropagation = async () => {
-  return { vouches: [] }
+  const d = await fetchIntentGraphAll(); return { vouches: d.vouches || [] }
 }
 
-// Rate Benchmarks (placeholder stubs)
-export const fetchRateBenchmarks = async () => {
-  return { benchmarks: [] }
+// ── Social Listening ──────────────────────────────────────
+const fetchSocialListeningAll = async () => {
+  const res = await api.get('/admin/social-listening')
+  return res.data
 }
-
-export const fetchRateTrends = async () => {
-  return { trends: [] }
-}
-
-export const fetchBenchmarkAccuracy = async () => {
-  return { accuracy: [] }
-}
-
-// Social Listening (placeholder stubs)
 export const fetchLiveSignalFeed = async () => {
-  return { signals: [] }
+  const d = await fetchSocialListeningAll(); return { signals: d.signals || [] }
 }
-
 export const fetchSignalConversionRate = async () => {
-  return { metrics: null }
+  const d = await fetchSocialListeningAll(); return { metrics: d.metrics || null }
 }
-
 export const fetchSignalConfidence = async () => {
-  return { distribution: [] }
+  const d = await fetchSocialListeningAll(); return { distribution: d.distribution || [] }
+}
+export const fetchUnfilledSignals = async () => {
+  const d = await fetchSocialListeningAll(); return { unfilled: d.unfilled || [] }
 }
 
-export const fetchUnfilledSignals = async () => {
-  return { unfilled: [] }
+// ── Ads & Campaigns ───────────────────────────────────────
+const fetchAdsCampaignsAll = async () => {
+  const res = await api.get('/admin/ads-campaigns')
+  return res.data
+}
+export const fetchActiveCampaigns = async () => {
+  const d = await fetchAdsCampaignsAll(); return { campaigns: d.campaigns || [] }
+}
+export const fetchCampaignPerformance = async () => {
+  const d = await fetchAdsCampaignsAll(); return { metrics: d.metrics || [] }
+}
+export const fetchAdRevenueDashboard = async () => {
+  const d = await fetchAdsCampaignsAll(); return { revenue: d.revenue || null }
+}
+export const fetchGigAdvances = async () => {
+  const d = await fetchAdsCampaignsAll(); return { advances: d.advances || [] }
+}
+export const fetchAdvanceRepayment = async () => {
+  const d = await fetchAdsCampaignsAll(); return { repayments: d.repayments || [] }
+}
+
+// ── Rate Benchmarks ───────────────────────────────────────
+const fetchRateBenchmarksAll = async () => {
+  const res = await api.get('/admin/rate-benchmarks')
+  return res.data
+}
+export const fetchRateBenchmarks = async () => {
+  const d = await fetchRateBenchmarksAll(); return { benchmarks: d.benchmarks || [] }
+}
+export const fetchRateTrends = async () => {
+  const d = await fetchRateBenchmarksAll(); return { trends: d.trends || [] }
+}
+export const fetchBenchmarkAccuracy = async () => {
+  const d = await fetchRateBenchmarksAll(); return { accuracy: d.accuracy || [] }
+}
+
+// ── Demand Forecasting ────────────────────────────────────
+const fetchDemandForecastAll = async () => {
+  const res = await api.get('/admin/demand-forecast')
+  return res.data
+}
+export const fetchDemandForecast = async () => {
+  const d = await fetchDemandForecastAll(); return { forecasts: d.forecasts || [] }
+}
+export const fetchSeasonalTrends = async () => {
+  const d = await fetchDemandForecastAll(); return { trends: d.trends || [] }
+}
+export const fetchForecastAccuracy = async () => {
+  const d = await fetchDemandForecastAll(); return { accuracy: d.accuracy || [] }
+}
+
+// ── Enterprise API ────────────────────────────────────────
+const fetchEnterpriseAPIAll = async () => {
+  const res = await api.get('/admin/enterprise-api')
+  return res.data
+}
+export const fetchAPIKeys = async () => {
+  const d = await fetchEnterpriseAPIAll(); return { keys: d.keys || [] }
+}
+export const fetchEnterpriseClients = async () => {
+  const d = await fetchEnterpriseAPIAll(); return { clients: d.clients || [] }
+}
+export const fetchAPIUsageBilling = async () => {
+  const d = await fetchEnterpriseAPIAll(); return { usage: d.usage || [] }
 }
 
 export default api

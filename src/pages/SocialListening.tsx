@@ -71,7 +71,9 @@ export default function SocialListening() {
       setConfidenceData(processedConf)
       setUnfilledSignals(processedUnfilled)
 
-      const avgConf = processedSignals.length > 0 ? processedSignals.reduce((sum: number, s: Signal) => sum + s.confidence, 0) / processedSignals.length : 0
+      const avgConf = processedSignals.length > 0
+        ? processedSignals.reduce((sum: number, s: Signal) => sum + (s.confidence || 0.75), 0) / processedSignals.length
+        : 0.75
 
       setStats({
         totalSignals: processedSignals.length,

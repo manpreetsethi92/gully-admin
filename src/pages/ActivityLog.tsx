@@ -6,11 +6,10 @@ import { formatRelativeTime } from '../utils/format'
 
 interface ActivityItem {
   id: string
-  event_type: string
-  description: string
-  timestamp: string
+  action: string
   user_id?: string
-  metadata?: Record<string, any>
+  details?: Record<string, any>
+  timestamp: string
 }
 
 export default function ActivityLogPage() {
@@ -20,7 +19,7 @@ export default function ActivityLogPage() {
   const load = async () => {
     setLoading(true)
     try {
-      const data = await fetchActivityLog(100)
+      const data = await fetchActivityLog(200)
       setActivities(Array.isArray(data) ? data : [])
     } catch (err) {
       console.error('Failed to load activity log:', err)
@@ -30,47 +29,60 @@ export default function ActivityLogPage() {
   }
   useEffect(() => { load() }, [])
 
-  const getEventIcon = (eventType: string) => {
-    switch(eventType) {
-      case 'job_ingested': return <Zap size={16} className="text-yellow-400" />
-      case 'match_created': return <Target size={16} className="text-green-400" />
-      case 'user_joined': return <Users size={16} className="text-blue-400" />
-      case 'request_created': return <Target size={16} className="text-purple-400" />
-      case 'match_converted': return <Activity size={16} className="text-accent" />
-      default: return <Activity size={16} className="text-gray-400" />
-    }
+  const getEventIcon = (action: string) => {
+    const a = action || ''
+    if (a.includes('job')) return <Zap size={16} className="text-yellow-400" />
+    if (a.includes('match')) return <Target size={16} className="text-green-400" />
+    if (a.includes('user') || a.includes('signup') || a.includes('join') || a.includes('onboard')) return <Users size={16} className="text-blue-400" />
+    if (a.includes('request')) return <Target size={16} className="text-purple-400" />
+    return <Activity size={16} className="text-gray-400" />
   }
 
-  // Compute stats from real data
+  const formatDetails = (details?: Record<string, any>): string => {
+    if (!details) return '—'
+    const parts = Object.entries(details)
+      .filter(([, v]) => v != null && v !== '')
+      .slice(0, 3)
+      .map(([k, v]) => `${k}: ${typeof v === 'object' ? JSON.stringify(v).slice(0, 40) : String(v).slice(0, 60)}`)
+    return parts.join(' · ') || '—'
+  }
+
   const now = new Date()
   const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate())
   const todayActivities = activities.filter(a => new Date(a.timestamp) >= todayStart)
-  const statsComputed = {
+  const stats = {
     today: todayActivities.length,
-    jobs: todayActivities.filter(a => a.event_type === 'job_ingested').length,
-    matches: todayActivities.filter(a => a.event_type === 'match_created').length,
-    users: todayActivities.filter(a => a.event_type === 'user_joined').length,
+    requests: activities.filter(a => a.action?.includes('request')).length,
+    matches: activities.filter(a => a.action?.includes('match')).length,
+    users: activities.filter(a => a.action?.includes('user') || a.action?.includes('join') || a.action?.includes('onboard')).length,
   }
 
   const columns = [
-    { key: 'event_type' as const, label: 'Event', render: (val: string) => (
+    { key: 'action' as const, label: 'Event', render: (val: string) => (
       <div className="flex items-center gap-2">
         {getEventIcon(val)}
-        <span className="text-sm font-medium capitalize">{val.replace(/_/g, ' ')}</span>
+        <span className="text-sm font-medium capitalize">{(val || '').replace(/_/g, ' ')}</span>
       </div>
-    ), width: '180px' },
-    { key: 'description' as const, label: 'Details', render: (val: string) => <span className="text-sm text-gray-300">{val}</span> },
-    { key: 'user_id' as const, label: 'User', render: (val?: string) => <span className="text-sm text-gray-400 font-mono">{val ? val.slice(0, 16) : 'system'}</span> },
-    { key: 'timestamp' as const, label: 'Time', render: (val: string) => <span className="text-sm text-gray-400">{formatRelativeTime(val)}</span>, sortable: true },
+    )},
+    { key: 'details' as const, label: 'Details', render: (val?: Record<string, any>) =>
+      <span className="text-sm text-gray-300 truncate max-w-xs block">{formatDetails(val)}</span>
+    },
+    { key: 'user_id' as const, label: 'User', render: (val?: string) =>
+      <span className="text-sm text-gray-400 font-mono">{val ? val.slice(0, 8) + '...' : 'system'}</span>
+    },
+    { key: 'timestamp' as const, label: 'Time', render: (val: string) =>
+      <span className="text-sm text-gray-400">{formatRelativeTime(val)}</span>
+    },
   ]
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Activity Log</h1>
-          <p className="text-gray-400 text-sm mt-1">All platform events and activities</p>
+          <p className="text-gray-400 text-sm mt-1">All platform events ({activities.length} total)</p>
         </div>
-        <button onClick={load} className="p-2 hover:bg-white/10 rounded-lg transition-colors" title="Refresh">
+        <button onClick={load} className="p-2 hover:bg-white/10 rounded-lg transition-colors">
           <RefreshCw size={20} className={loading ? 'animate-spin' : ''} />
         </button>
       </div>
@@ -78,19 +90,19 @@ export default function ActivityLogPage() {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div className="bg-dark-surface border border-dark-border rounded-lg p-4">
           <div className="text-sm text-gray-400 mb-1">Today's Events</div>
-          <div className="text-2xl font-bold">{statsComputed.today}</div>
+          <div className="text-2xl font-bold">{stats.today}</div>
         </div>
         <div className="bg-dark-surface border border-dark-border rounded-lg p-4">
-          <div className="text-sm text-gray-400 mb-1">Jobs Ingested</div>
-          <div className="text-2xl font-bold">{statsComputed.jobs}</div>
+          <div className="text-sm text-gray-400 mb-1">Request Events</div>
+          <div className="text-2xl font-bold">{stats.requests}</div>
         </div>
         <div className="bg-dark-surface border border-dark-border rounded-lg p-4">
-          <div className="text-sm text-gray-400 mb-1">Matches Created</div>
-          <div className="text-2xl font-bold">{statsComputed.matches}</div>
+          <div className="text-sm text-gray-400 mb-1">Match Events</div>
+          <div className="text-2xl font-bold">{stats.matches}</div>
         </div>
         <div className="bg-dark-surface border border-dark-border rounded-lg p-4">
-          <div className="text-sm text-gray-400 mb-1">New Users</div>
-          <div className="text-2xl font-bold">{statsComputed.users}</div>
+          <div className="text-sm text-gray-400 mb-1">User Events</div>
+          <div className="text-2xl font-bold">{stats.users}</div>
         </div>
       </div>
 

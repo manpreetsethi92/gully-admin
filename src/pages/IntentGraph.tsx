@@ -74,6 +74,7 @@ export default function IntentGraph() {
         fetchTrustPropagation(),
       ])
 
+      // All 5 calls hit the same /admin/intent-graph endpoint — use first response's full data
       const processedNodes = Array.isArray(nodesData.nodes) ? nodesData.nodes : []
       const processedEdges = Array.isArray(edgesData.edges) ? edgesData.edges : []
       const processedTeams = Array.isArray(teamsData.teams) ? teamsData.teams : []

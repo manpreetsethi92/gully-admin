@@ -59,7 +59,9 @@ export default function DemandForecasting() {
       setSeasonalTrends(processedSeasonal)
       setAccuracy(processedAccuracy)
 
-      const avgConf = processedForecast.length > 0 ? processedForecast.reduce((sum: number, f: DemandForecast) => sum + f.confidence_level, 0) / processedForecast.length : 0
+      const avgConf = processedForecast.length > 0
+        ? processedForecast.reduce((sum: number, f: DemandForecast) => sum + (f.confidence_level || 0.75), 0) / processedForecast.length
+        : 0
       const trendingUp = processedForecast.filter((f: DemandForecast) => f.trending_up).length
 
       setStats({

@@ -91,7 +91,14 @@ export default function AdsCampaigns() {
 
       setCampaigns(processedCamps)
       setMetrics(processedMetrics)
-      setAdRevenue(processedRevenue)
+      setAdRevenue(processedRevenue || (processedCamps.length > 0 ? {
+        total_daily_revenue: 0,
+        total_weekly_revenue: 0,
+        total_monthly_revenue: 0,
+        active_campaigns: processedCamps.length,
+        avg_roi: 0,
+        top_category: ''
+      } : null))
       setAdvances(processedAdvances)
       setRepayments(processedRepay)
     } catch (error) {

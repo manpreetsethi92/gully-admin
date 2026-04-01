@@ -19,12 +19,12 @@ export default function Matches() {
   const loadMatches = async () => {
     try {
       const data = await fetchMatches(500)
-      const mtchs: Match[] = Array.isArray(data.matches) ? data.matches : data
+      const mtchs: Match[] = Array.isArray(data.matches) ? data.matches : Array.isArray(data) ? data : []
       setMatches(mtchs)
       setStats({
         total: mtchs.length,
-        pending: mtchs.filter((m: Match) => m.status === 'pending').length,
-        converted: mtchs.filter((m: Match) => m.status === 'converted').length,
+        pending: mtchs.filter((m: Match) => m.status === 'suggested' || m.status === 'pending').length,
+        converted: mtchs.filter((m: Match) => m.status === 'converted' || m.status === 'accepted' || m.status === 'connected').length,
       })
     } catch (error) {
       console.error('Failed to load matches:', error)

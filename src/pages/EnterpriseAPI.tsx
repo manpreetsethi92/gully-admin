@@ -68,11 +68,13 @@ export default function EnterpriseAPI() {
 
       const activeKeysCount = processedKeys.filter((k: APIKey) => k.status === 'active').length
       const totalRevenue = processedClients.reduce((sum: number, c: EnterpriseClient) => sum + c.contract_value, 0)
+      // Use real stats from backend if available
+      const backendStats = (keysData as any).stats || (usageData as any).stats || {}
 
       setStats({
-        activeKeys: activeKeysCount,
-        totalClients: processedClients.length,
-        totalRevenue,
+        activeKeys: activeKeysCount || backendStats.active_keys || 0,
+        totalClients: processedClients.length || backendStats.enterprise_clients || 0,
+        totalRevenue: totalRevenue || backendStats.total_api_calls || 0,
       })
     } catch (error) {
       console.error('Failed to load enterprise API data:', error)
@@ -142,7 +144,7 @@ export default function EnterpriseAPI() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <StatCard label="Active API Keys" value={stats.activeKeys} icon={<Key size={20} />} index={0} />
         <StatCard label="Enterprise Clients" value={stats.totalClients} icon={<Building2 size={20} />} index={1} />
-        <StatCard label="Total Contract Value" value={`$${(stats.totalRevenue / 1000).toFixed(1)}k`} icon={<DollarSign size={20} />} index={2} />
+        <StatCard label="Total API Calls" value={stats.totalRevenue.toLocaleString()} icon={<DollarSign size={20} />} index={2} />
       </div>
 
       <div className="bg-dark-surface border border-dark-border rounded-lg">
