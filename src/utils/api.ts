@@ -1,10 +1,14 @@
 import axios from 'axios'
 
-const API_BASE = import.meta.env.VITE_API_URL || 'https://titly-backend-production.up.railway.app/api'
+const API_BASE = import.meta.env.VITE_API_URL || 'https://api.trygully.com/api'
+const ADMIN_SECRET = import.meta.env.VITE_ADMIN_SECRET || 'gully-admin-secret-123'
 
 const api = axios.create({
   baseURL: API_BASE,
   timeout: 10000,
+  headers: {
+    'x-admin-secret': ADMIN_SECRET,
+  },
 })
 
 export const fetchDashboardStats = async () => {
@@ -36,7 +40,18 @@ export const fetchUsers = async (limit = 200, page = 1) => {
   return response.data
 }
 
-export const fetchGrowthDaily = async () => {
+export const fetchUserDetail = async (userId: string) => {
+  const response = await api.get(`/admin/dashboard/users/${userId}`)
+  return response.data
+}
+
+export const fetchFabricUser = async (userId: string) => {
+  // Get fabric enrichment data for a user
+  const response = await api.get(`/admin/dashboard/users/${userId}/fabric`)
+  return response.data
+}
+
+
   const response = await api.get('/admin/analytics/growth')
   return response.data
 }
