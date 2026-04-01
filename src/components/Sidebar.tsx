@@ -98,7 +98,7 @@ export default function Sidebar({ open, onToggle, mobileOpen, onMobileClose }: S
             <div className="w-10 h-10 rounded-lg bg-accent/20 flex items-center justify-center">
               <Zap size={24} className="text-accent" />
             </div>
-            {showLabel && <div className="font-bold text-lg">TITLII</div>}
+            {showLabel && <div className="font-bold text-lg">GULLY</div>}
           </div>
           <button onClick={onMobileClose} className="md:hidden p-2 hover:bg-white/10 rounded-lg">
             <X size={20} />
