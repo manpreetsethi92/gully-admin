@@ -7,14 +7,22 @@ import { formatRelativeTime } from '../utils/format'
 
 interface OutreachItem {
   id: string
-  professional_name?: string
-  professional_linkedin?: string
-  requester_name?: string
+  // API returns these field names from /api/passive/outreach-dashboard
+  professional?: string
+  professional_name?: string  // fallback
+  linkedin?: string
+  professional_linkedin?: string  // fallback
+  requester?: string
+  requester_name?: string  // fallback
   requester_phone?: string
   channel?: string
   status: string
-  intro_message?: string
-  created_at: string
+  message?: string
+  intro_message?: string  // fallback
+  requested_at?: string
+  created_at?: string
+  title?: string
+  city?: string
 }
 
 interface OutreachData {
@@ -100,20 +108,24 @@ export default function OutreachQueue() {
               <tr key={item.id} className="border-b border-dark-border/50 hover:bg-white/5">
                 <td className="px-4 py-3">
                   <div className="flex items-center gap-2">
-                    <span className="font-medium">{item.professional_name || '—'}</span>
-                    {item.professional_linkedin && (
-                      <a href={item.professional_linkedin} target="_blank" rel="noreferrer">
+                    <div>
+                      <span className="font-medium">{item.professional || item.professional_name || '—'}</span>
+                      {item.title && <div className="text-xs text-gray-400">{item.title}</div>}
+                      {item.city && <div className="text-xs text-gray-500">{item.city}</div>}
+                    </div>
+                    {(item.linkedin || item.professional_linkedin) && (
+                      <a href={item.linkedin || item.professional_linkedin} target="_blank" rel="noreferrer">
                         <ExternalLink size={12} className="text-blue-400" />
                       </a>
                     )}
                   </div>
                 </td>
-                <td className="px-4 py-3 text-gray-400">{item.requester_name || '—'}</td>
+                <td className="px-4 py-3 text-gray-400">{item.requester || item.requester_name || '—'}</td>
                 <td className="px-4 py-3">
                   <span className="px-2 py-0.5 bg-blue-500/20 text-blue-400 rounded text-xs capitalize">{item.channel || 'linkedin'}</span>
                 </td>
                 <td className="px-4 py-3 text-gray-300 max-w-xs">
-                  <span className="truncate block">{item.intro_message?.slice(0, 60) || '—'}</span>
+                  <span className="truncate block">{(item.message || item.intro_message)?.slice(0, 60) || '—'}</span>
                 </td>
                 <td className="px-4 py-3">
                   <span className={`px-2 py-0.5 rounded text-xs font-medium ${
@@ -122,7 +134,7 @@ export default function OutreachQueue() {
                     'bg-gray-500/20 text-gray-400'
                   }`}>{item.status}</span>
                 </td>
-                <td className="px-4 py-3 text-gray-400 text-xs">{formatRelativeTime(item.created_at)}</td>
+                <td className="px-4 py-3 text-gray-400 text-xs">{formatRelativeTime(item.requested_at || item.created_at || '')}</td>
               </tr>
             ))}
           </tbody>
