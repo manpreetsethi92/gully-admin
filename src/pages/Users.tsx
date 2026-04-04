@@ -41,6 +41,24 @@ interface UserDetail {
     fabric_ig_followers?: number
     fabric_ig_bio?: string
     fabric_ig_following_sample: string[]
+    fabric_ig_network_role?: string
+    fabric_ig_follower_count?: number
+    fabric_ig_following_count?: number
+    fabric_ig_follower_ratio?: number
+    fabric_ig_activity_trend?: string
+    fabric_ig_trend_pct?: number
+    fabric_ig_monthly_activity?: Record<string, number>
+    fabric_ig_collection_names?: string[]
+    fabric_ig_collection_categories?: Record<string, number>
+    fabric_ig_aspiration_accounts?: string[]
+    fabric_ig_social_circle?: string[]
+    fabric_ig_comment_targets?: string[]
+    fabric_ig_searched_profiles?: string[]
+    fabric_ig_ad_brands?: string[]
+    fabric_ig_warm_matches?: any[]
+    fabric_ig_taj_context?: string
+    fabric_ig_affinity_scores?: Record<string, number>
+    fabric_ig_videos_watched?: number
     fabric_linkedin_headline?: string
     fabric_linkedin_skills: string[]
     fabric_linkedin_experience: any[]
@@ -328,61 +346,126 @@ export default function Users() {
               {/* Fabric Enrichment */}
               {(selected.fabric.fabric_niche || selected.fabric.fabric_linkedin_headline || selected.fabric.fabric_ig_username) && (
                 <Section title="Fabric Data">
+                  {/* Taj conversation context */}
+                  {selected.fabric.fabric_ig_taj_context && (
+                    <div className="text-sm mb-2 p-2 rounded-lg bg-white/5 border border-purple-500/20">
+                      <span className="text-purple-400 text-xs font-medium block mb-1">TAJ CONTEXT</span>
+                      <span className="text-white/80 text-xs italic">{selected.fabric.fabric_ig_taj_context}</span>
+                    </div>
+                  )}
+                  {/* IG identity */}
+                  <Row label="IG Username" value={selected.fabric.fabric_ig_username} />
+                  <Row label="IG Bio" value={selected.fabric.fabric_ig_bio} />
+                  <Row label="IG Followers" value={selected.fabric.fabric_ig_follower_count?.toString() || selected.fabric.fabric_ig_followers?.toString()} />
+                  <Row label="IG Following" value={selected.fabric.fabric_ig_following_count?.toString()} />
+                  <Row label="IG Ratio" value={selected.fabric.fabric_ig_follower_ratio ? `${selected.fabric.fabric_ig_follower_ratio}x` : undefined} />
+                  <Row label="IG Network Role" value={selected.fabric.fabric_ig_network_role} />
+                  <Row label="IG Activity" value={selected.fabric.fabric_ig_activity_trend ? `${selected.fabric.fabric_ig_activity_trend} (${selected.fabric.fabric_ig_trend_pct ?? 0}%)` : undefined} />
+                  <Row label="Videos Watched" value={selected.fabric.fabric_ig_videos_watched?.toString()} />
+                  {/* Taj context fields */}
                   <Row label="Niche" value={selected.fabric.fabric_niche} />
                   <Row label="Industry" value={selected.fabric.fabric_industry} />
                   <Row label="Experience" value={selected.fabric.fabric_experience_level} />
+                  {/* LinkedIn */}
                   <Row label="LinkedIn Headline" value={selected.fabric.fabric_linkedin_headline} />
                   <Row label="LinkedIn Connections" value={selected.fabric.fabric_linkedin_connections?.toString()} />
-                  <Row label="IG Username" value={selected.fabric.fabric_ig_username} />
-                  <Row label="IG Followers" value={selected.fabric.fabric_ig_followers?.toString()} />
-                  <Row label="IG Network Role" value={(selected.fabric as any).fabric_ig_network_role} />
-                  <Row label="IG Activity Trend" value={(selected.fabric as any).fabric_ig_activity_trend} />
+                  {/* Sync info */}
                   <Row label="Thread Count" value={selected.fabric.thread_count?.toString()} />
                   <Row label="Last Synced" value={selected.fabric.last_synced_at ? formatRelativeTime(selected.fabric.last_synced_at) : undefined} />
-                  {(selected.fabric as any).fabric_ig_collection_names?.length > 0 && (
+
+                  {/* Collection names + categories */}
+                  {(selected.fabric.fabric_ig_collection_names || []).length > 0 && (
                     <div className="text-sm">
                       <span className="text-white/50">Saved Collections</span>
                       <div className="flex flex-wrap gap-1 mt-1">
-                        {((selected.fabric as any).fabric_ig_collection_names as string[]).slice(0, 8).map((c: string) => (
+                        {(selected.fabric.fabric_ig_collection_names || []).slice(0, 10).map((c: string) => (
                           <Badge key={c} label={c} color="purple" />
                         ))}
                       </div>
                     </div>
                   )}
-                  {(selected.fabric as any).fabric_ig_aspiration_accounts?.length > 0 && (
+                  {Object.keys(selected.fabric.fabric_ig_collection_categories || {}).length > 0 && (
+                    <div className="text-sm">
+                      <span className="text-white/50">Collection Categories</span>
+                      <div className="flex flex-wrap gap-1 mt-1">
+                        {Object.entries(selected.fabric.fabric_ig_collection_categories || {})
+                          .sort(([,a],[,b]) => (b as number)-(a as number))
+                          .map(([cat, count]) => (
+                            <Badge key={cat} label={`${cat} (${count})`} color="purple" />
+                          ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Aspiration accounts */}
+                  {(selected.fabric.fabric_ig_aspiration_accounts || []).length > 0 && (
                     <div className="text-sm">
                       <span className="text-white/50">Aspiration Accounts</span>
                       <div className="flex flex-wrap gap-1 mt-1">
-                        {((selected.fabric as any).fabric_ig_aspiration_accounts as string[]).slice(0, 6).map((a: string) => (
+                        {(selected.fabric.fabric_ig_aspiration_accounts || []).slice(0, 8).map((a: string) => (
                           <Badge key={a} label={`@${a}`} color="blue" />
                         ))}
                       </div>
                     </div>
                   )}
-                  {(selected.fabric as any).fabric_ig_comment_targets?.length > 0 && (
+
+                  {/* Social circle */}
+                  {(selected.fabric.fabric_ig_social_circle || []).length > 0 && (
                     <div className="text-sm">
-                      <span className="text-white/50">Comment Targets</span>
+                      <span className="text-white/50">Social Circle</span>
                       <div className="flex flex-wrap gap-1 mt-1">
-                        {((selected.fabric as any).fabric_ig_comment_targets as string[]).slice(0, 6).map((a: string) => (
+                        {(selected.fabric.fabric_ig_social_circle || []).slice(0, 8).map((a: string) => (
+                          <Badge key={a} label={`@${a}`} color="gray" />
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Comment targets */}
+                  {(selected.fabric.fabric_ig_comment_targets || []).length > 0 && (
+                    <div className="text-sm">
+                      <span className="text-white/50">Comment Targets (warm network)</span>
+                      <div className="flex flex-wrap gap-1 mt-1">
+                        {(selected.fabric.fabric_ig_comment_targets || []).slice(0, 8).map((a: string) => (
                           <Badge key={a} label={`@${a}`} color="green" />
                         ))}
                       </div>
                     </div>
                   )}
-                  {(selected.fabric as any).fabric_ig_warm_matches?.length > 0 && (
+
+                  {/* Profile searches */}
+                  {(selected.fabric.fabric_ig_searched_profiles || []).length > 0 && (
+                    <div className="text-sm">
+                      <span className="text-white/50">Profile Searches (highest intent)</span>
+                      <div className="flex flex-wrap gap-1 mt-1">
+                        {(selected.fabric.fabric_ig_searched_profiles || []).map((a: string) => (
+                          <Badge key={a} label={`@${a}`} color="yellow" />
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Warm matches on Gully */}
+                  {(selected.fabric.fabric_ig_warm_matches || []).length > 0 && (
                     <div className="text-sm">
                       <span className="text-white/50">Warm IG Matches on Gully</span>
                       <div className="flex flex-wrap gap-1 mt-1">
-                        {((selected.fabric as any).fabric_ig_warm_matches as any[]).slice(0, 5).map((m: any) => (
+                        {(selected.fabric.fabric_ig_warm_matches || []).slice(0, 5).map((m: any) => (
                           <Badge key={m.gully_user_id} label={m.name || m.ig_handle} color="yellow" />
                         ))}
                       </div>
                     </div>
                   )}
+
+                  {/* Extracted skills */}
                   {(selected.fabric.fabric_extracted_skills || []).length > 0 && (
                     <div className="text-sm">
                       <span className="text-white/50">Extracted Skills</span>
-                      <div className="flex flex-wrap gap-1 mt-1">{selected.fabric.fabric_extracted_skills.slice(0, 6).map(s => <Badge key={s} label={s} color="purple" />)}</div>
+                      <div className="flex flex-wrap gap-1 mt-1">
+                        {selected.fabric.fabric_extracted_skills.slice(0, 8).map(s => (
+                          <Badge key={s} label={s} color="purple" />
+                        ))}
+                      </div>
                     </div>
                   )}
                 </Section>
