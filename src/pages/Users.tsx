@@ -335,8 +335,50 @@ export default function Users() {
                   <Row label="LinkedIn Connections" value={selected.fabric.fabric_linkedin_connections?.toString()} />
                   <Row label="IG Username" value={selected.fabric.fabric_ig_username} />
                   <Row label="IG Followers" value={selected.fabric.fabric_ig_followers?.toString()} />
+                  <Row label="IG Network Role" value={(selected.fabric as any).fabric_ig_network_role} />
+                  <Row label="IG Activity Trend" value={(selected.fabric as any).fabric_ig_activity_trend} />
                   <Row label="Thread Count" value={selected.fabric.thread_count?.toString()} />
                   <Row label="Last Synced" value={selected.fabric.last_synced_at ? formatRelativeTime(selected.fabric.last_synced_at) : undefined} />
+                  {(selected.fabric as any).fabric_ig_collection_names?.length > 0 && (
+                    <div className="text-sm">
+                      <span className="text-white/50">Saved Collections</span>
+                      <div className="flex flex-wrap gap-1 mt-1">
+                        {((selected.fabric as any).fabric_ig_collection_names as string[]).slice(0, 8).map((c: string) => (
+                          <Badge key={c} label={c} color="purple" />
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  {(selected.fabric as any).fabric_ig_aspiration_accounts?.length > 0 && (
+                    <div className="text-sm">
+                      <span className="text-white/50">Aspiration Accounts</span>
+                      <div className="flex flex-wrap gap-1 mt-1">
+                        {((selected.fabric as any).fabric_ig_aspiration_accounts as string[]).slice(0, 6).map((a: string) => (
+                          <Badge key={a} label={`@${a}`} color="blue" />
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  {(selected.fabric as any).fabric_ig_comment_targets?.length > 0 && (
+                    <div className="text-sm">
+                      <span className="text-white/50">Comment Targets</span>
+                      <div className="flex flex-wrap gap-1 mt-1">
+                        {((selected.fabric as any).fabric_ig_comment_targets as string[]).slice(0, 6).map((a: string) => (
+                          <Badge key={a} label={`@${a}`} color="green" />
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  {(selected.fabric as any).fabric_ig_warm_matches?.length > 0 && (
+                    <div className="text-sm">
+                      <span className="text-white/50">Warm IG Matches on Gully</span>
+                      <div className="flex flex-wrap gap-1 mt-1">
+                        {((selected.fabric as any).fabric_ig_warm_matches as any[]).slice(0, 5).map((m: any) => (
+                          <Badge key={m.gully_user_id} label={m.name || m.ig_handle} color="yellow" />
+                        ))}
+                      </div>
+                    </div>
+                  )}
                   {(selected.fabric.fabric_extracted_skills || []).length > 0 && (
                     <div className="text-sm">
                       <span className="text-white/50">Extracted Skills</span>
