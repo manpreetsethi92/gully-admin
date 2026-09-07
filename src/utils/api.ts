@@ -99,13 +99,11 @@ export const fetchJobAlertHistory = async (limit = 500) => {
   return response.data
 }
 
-export const triggerScrape = async (source: string) => {
-  const response = await api.post(`/admin/scrape/${source}`, null, LONG)
-  return response.data
-}
-
-export const triggerProcessQueue = async () => {
-  const response = await api.post('/admin/process-queue', null, LONG)
+// /admin/scrape/<source> fetches and returns without saving — it is a preview.
+// This route runs the same code the 6am cron does and persists to external_jobs.
+export const triggerScrapeIngest = async (skill: string, location = '') => {
+  const params = new URLSearchParams({ skill, location, limit: '25' })
+  const response = await api.post(`/admin/scrape/ingest?${params}`, null, LONG)
   return response.data
 }
 
