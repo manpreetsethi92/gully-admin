@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom'
 import { useState } from 'react'
 import Layout from './components/Layout'
+import { getAdminToken, clearAdminToken } from './utils/api'
 import Dashboard from './pages/Dashboard'
 import WAGroupJobs from './pages/WAGroupJobs'
 import JobPipeline from './pages/JobPipeline'
@@ -27,7 +28,9 @@ import RateBenchmarks from './pages/RateBenchmarks'
 import DemandForecasting from './pages/DemandForecasting'
 import EnterpriseAPI from './pages/EnterpriseAPI'
 
-const SESSION_KEY = 'gully_admin_auth'
+// Session state is the token itself, held by utils/api. A separate boolean
+// flag would let the UI think it is signed in after the token expired.
+
 
 function ProtectedLayout({ onLogout }: { onLogout: () => void }) {
   return (
@@ -39,17 +42,17 @@ function ProtectedLayout({ onLogout }: { onLogout: () => void }) {
 
 function App() {
   const [authed, setAuthed] = useState(() => {
-    const stored = sessionStorage.getItem(SESSION_KEY)
+    const stored = getAdminToken()
     return stored === 'true'
   })
 
   const handleLogin = () => {
-    sessionStorage.setItem(SESSION_KEY, 'true')
+    // token was stored by adminLogin()
     setAuthed(true)
   }
 
   const handleLogout = () => {
-    sessionStorage.removeItem(SESSION_KEY)
+    clearAdminToken()
     setAuthed(false)
   }
 

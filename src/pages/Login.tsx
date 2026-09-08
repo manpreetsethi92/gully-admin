@@ -1,27 +1,35 @@
 import { useState } from 'react'
 import { Zap, Eye, EyeOff } from 'lucide-react'
+import { adminLogin } from '../utils/api'
 
-// SECURITY WARNING: Client-side password check is NOT secure!
-// This should be replaced with proper backend authentication.
-// For now, password is moved to environment variable.
-const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD || ''
-
-if (!ADMIN_PASSWORD) {
-  console.error('VITE_ADMIN_PASSWORD not set - admin login will not work')
-}
-
+// The password is verified by the backend, which returns a short-lived session
+// token. It used to be compared here against VITE_ADMIN_PASSWORD — a check that
+// gated rendering rather than access, with the password itself published in the
+// bundle for anyone to read.
 export default function Login({ onLogin }: { onLogin: () => void }) {
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [showPassword, setShowPassword] = useState(false)
+  const [busy, setBusy] = useState(false)
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (password === ADMIN_PASSWORD) {
+    setBusy(true)
+    setError('')
+    try {
+      await adminLogin(password)
       onLogin()
-    } else {
-      setError('Invalid password')
+    } catch (err: any) {
+      const status = err?.response?.status
+      setError(
+        status === 429 ? 'Too many attempts. Try again later.'
+        : status === 401 ? 'Invalid password'
+        : status === 503 ? 'Admin login is not configured on the server.'
+        : 'Could not reach the server. Check your connection.',
+      )
       setPassword('')
+    } finally {
+      setBusy(false)
     }
   }
 
@@ -56,9 +64,10 @@ export default function Login({ onLogin }: { onLogin: () => void }) {
           {error && <p className="text-red-400 text-sm">{error}</p>}
           <button
             type="submit"
-            className="w-full py-3 bg-accent rounded-lg text-white font-medium hover:bg-accent/90 transition-colors"
+            disabled={busy || !password}
+            className="w-full py-3 bg-accent rounded-lg text-white font-medium hover:bg-accent/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Sign In
+            {busy ? 'Signing in…' : 'Sign In'}
           </button>
         </form>
       </div>

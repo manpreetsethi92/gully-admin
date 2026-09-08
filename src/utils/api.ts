@@ -1,20 +1,46 @@
 import axios from 'axios'
 
 const API_BASE = import.meta.env.VITE_API_URL || 'https://api.trygully.com/api'
-const ADMIN_SECRET = import.meta.env.VITE_ADMIN_SECRET || 'gully-admin-secret-123'
 
 // Sanity check — ensure we never accidentally use the old Railway URL
 if (API_BASE.includes('railway.app') || API_BASE.includes('titly-backend')) {
   console.error('WRONG API URL DETECTED — should be api.trygully.com')
 }
 
-const api = axios.create({
-  baseURL: API_BASE,
-  timeout: 10000,
-  headers: {
-    'x-admin-secret': ADMIN_SECRET,
-  },
+// The admin secret used to be read from VITE_ADMIN_SECRET and sent on every
+// request. Anything VITE_-prefixed is compiled into the bundle, so that secret
+// was published with the site and worked against production for anyone who
+// opened devtools. The browser now holds only a short-lived session token,
+// issued by the backend after it checks the password server-side.
+const TOKEN_KEY = 'gully_admin_token'
+
+export const setAdminToken = (t: string) => sessionStorage.setItem(TOKEN_KEY, t)
+export const getAdminToken = () => sessionStorage.getItem(TOKEN_KEY)
+export const clearAdminToken = () => sessionStorage.removeItem(TOKEN_KEY)
+
+export const adminLogin = async (password: string) => {
+  const res = await axios.post(`${API_BASE}/admin/auth/login`, { password })
+  setAdminToken(res.data.token)
+  return res.data
+}
+
+const api = axios.create({ baseURL: API_BASE, timeout: 10000 })
+
+api.interceptors.request.use((config) => {
+  const t = getAdminToken()
+  if (t) config.headers.Authorization = `Bearer ${t}`
+  return config
 })
+
+// A 401 means the session expired or was never valid — drop it so the app
+// falls back to the login screen instead of retrying forever with a dead token.
+api.interceptors.response.use(
+  (r) => r,
+  (err) => {
+    if (err?.response?.status === 401) clearAdminToken()
+    return Promise.reject(err)
+  },
+)
 
 export const fetchDashboardStats = async () => {
   const response = await api.get('/admin/dashboard/overview')
