@@ -32,6 +32,16 @@ import EnterpriseAPI from './pages/EnterpriseAPI'
 // flag would let the UI think it is signed in after the token expired.
 
 
+function hasLiveToken(token: string | null): boolean {
+  if (!token) return false
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')))
+    return typeof payload.exp !== 'number' || payload.exp * 1000 > Date.now()
+  } catch {
+    return false // not a JWT at all — e.g. a stale value from the old boolean flag
+  }
+}
+
 function ProtectedLayout({ onLogout }: { onLogout: () => void }) {
   return (
     <Layout onLogout={onLogout}>
@@ -41,10 +51,12 @@ function ProtectedLayout({ onLogout }: { onLogout: () => void }) {
 }
 
 function App() {
-  const [authed, setAuthed] = useState(() => {
-    const stored = getAdminToken()
-    return stored === 'true'
-  })
+  // Signed in means "holds a token that has not expired". This used to compare
+  // the stored value to the string 'true' — left over from the old boolean flag
+  // when the session became a JWT — so every reload or deep link logged the admin
+  // out. Expiry is read from the token so a dead one shows the login screen
+  // instead of a dashboard full of 401s; the server still verifies every request.
+  const [authed, setAuthed] = useState(() => hasLiveToken(getAdminToken()))
 
   const handleLogin = () => {
     // token was stored by adminLogin()
