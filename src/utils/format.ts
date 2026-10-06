@@ -26,6 +26,10 @@ export const formatRelativeTime = (date: string | Date) => {
 
 export const formatPhone = (phone?: string) => {
   if (!phone) return '—'
+  // The backend masks phones before they leave the server ("+•••••••6680"). This
+  // function strips non-digits, so a masked value would become "6680" and then be
+  // dressed up as "+916680" — a plausible-looking number that is not anyone's.
+  if (phone.includes('•')) return phone
   // Ensure +91 format for Indian numbers
   const clean = phone.replace(/\D/g, '')
   if (clean.length === 10) return `+91${clean}`

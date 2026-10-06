@@ -120,6 +120,15 @@ export const fetchJobAlertStats = async () => {
   return response.data
 }
 
+// Phones arrive masked from every admin endpoint; this is the one audited call
+// that returns a full number. Every use is logged server-side and capped per hour.
+export type PhoneKind = 'user' | 'outreach_contact' | 'wa_group_contact'
+
+export const revealPhone = async (kind: PhoneKind, ref: string): Promise<string> => {
+  const response = await api.post('/admin/reveal-phone', { kind, ref })
+  return response.data.phone
+}
+
 export const fetchJobAlertHistory = async (limit = 500) => {
   const response = await api.get(`/admin/job-alerts/history?limit=${limit}`)
   return response.data
