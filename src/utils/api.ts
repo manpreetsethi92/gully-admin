@@ -1,6 +1,8 @@
 import axios from 'axios'
 
-const API_BASE = import.meta.env.VITE_API_URL || 'https://api.trygully.com/api'
+// Fallback for builds with no VITE_API_URL (Vercel). Move back to api.trygully.com
+// once its DNS points at Fly; until then that name still resolves to dead Railway.
+const API_BASE = import.meta.env.VITE_API_URL || 'https://gully-backend.fly.dev/api'
 
 // Sanity check — ensure we never accidentally use the old Railway URL
 if (API_BASE.includes('railway.app') || API_BASE.includes('titly-backend')) {
