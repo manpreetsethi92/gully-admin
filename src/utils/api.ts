@@ -1,20 +1,48 @@
 import axios from 'axios'
 
-const API_BASE = import.meta.env.VITE_API_URL || 'https://api.trygully.com/api'
-const ADMIN_SECRET = import.meta.env.VITE_ADMIN_SECRET || 'gully-admin-secret-123'
+// Fallback for builds with no VITE_API_URL (Vercel). Move back to api.trygully.com
+// once its DNS points at Fly; until then that name still resolves to dead Railway.
+const API_BASE = import.meta.env.VITE_API_URL || 'https://gully-backend.fly.dev/api'
 
 // Sanity check — ensure we never accidentally use the old Railway URL
 if (API_BASE.includes('railway.app') || API_BASE.includes('titly-backend')) {
   console.error('WRONG API URL DETECTED — should be api.trygully.com')
 }
 
-const api = axios.create({
-  baseURL: API_BASE,
-  timeout: 10000,
-  headers: {
-    'x-admin-secret': ADMIN_SECRET,
-  },
+// The admin secret used to be read from VITE_ADMIN_SECRET and sent on every
+// request. Anything VITE_-prefixed is compiled into the bundle, so that secret
+// was published with the site and worked against production for anyone who
+// opened devtools. The browser now holds only a short-lived session token,
+// issued by the backend after it checks the password server-side.
+const TOKEN_KEY = 'gully_admin_token'
+
+export const setAdminToken = (t: string) => sessionStorage.setItem(TOKEN_KEY, t)
+export const getAdminToken = () => sessionStorage.getItem(TOKEN_KEY)
+export const clearAdminToken = () => sessionStorage.removeItem(TOKEN_KEY)
+
+export const adminLogin = async (password: string) => {
+  const res = await axios.post(`${API_BASE}/admin/auth/login`, { password })
+  setAdminToken(res.data.token)
+  return res.data
+}
+
+const api = axios.create({ baseURL: API_BASE, timeout: 10000 })
+
+api.interceptors.request.use((config) => {
+  const t = getAdminToken()
+  if (t) config.headers.Authorization = `Bearer ${t}`
+  return config
 })
+
+// A 401 means the session expired or was never valid — drop it so the app
+// falls back to the login screen instead of retrying forever with a dead token.
+api.interceptors.response.use(
+  (r) => r,
+  (err) => {
+    if (err?.response?.status === 401) clearAdminToken()
+    return Promise.reject(err)
+  },
+)
 
 export const fetchDashboardStats = async () => {
   const response = await api.get('/admin/dashboard/overview')
@@ -94,18 +122,25 @@ export const fetchJobAlertStats = async () => {
   return response.data
 }
 
+// Phones arrive masked from every admin endpoint; this is the one audited call
+// that returns a full number. Every use is logged server-side and capped per hour.
+export type PhoneKind = 'user' | 'outreach_contact' | 'wa_group_contact'
+
+export const revealPhone = async (kind: PhoneKind, ref: string): Promise<string> => {
+  const response = await api.post('/admin/reveal-phone', { kind, ref })
+  return response.data.phone
+}
+
 export const fetchJobAlertHistory = async (limit = 500) => {
   const response = await api.get(`/admin/job-alerts/history?limit=${limit}`)
   return response.data
 }
 
-export const triggerScrape = async (source: string) => {
-  const response = await api.post(`/admin/scrape/${source}`, null, LONG)
-  return response.data
-}
-
-export const triggerProcessQueue = async () => {
-  const response = await api.post('/admin/process-queue', null, LONG)
+// /admin/scrape/<source> fetches and returns without saving — it is a preview.
+// This route runs the same code the 6am cron does and persists to external_jobs.
+export const triggerScrapeIngest = async (skill: string, location = '') => {
+  const params = new URLSearchParams({ skill, location, limit: '25' })
+  const response = await api.post(`/admin/scrape/ingest?${params}`, null, LONG)
   return response.data
 }
 

@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom'
 import { useState } from 'react'
 import Layout from './components/Layout'
+import { getAdminToken, clearAdminToken } from './utils/api'
 import Dashboard from './pages/Dashboard'
 import WAGroupJobs from './pages/WAGroupJobs'
 import JobPipeline from './pages/JobPipeline'
@@ -27,7 +28,19 @@ import RateBenchmarks from './pages/RateBenchmarks'
 import DemandForecasting from './pages/DemandForecasting'
 import EnterpriseAPI from './pages/EnterpriseAPI'
 
-const SESSION_KEY = 'gully_admin_auth'
+// Session state is the token itself, held by utils/api. A separate boolean
+// flag would let the UI think it is signed in after the token expired.
+
+
+function hasLiveToken(token: string | null): boolean {
+  if (!token) return false
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')))
+    return typeof payload.exp !== 'number' || payload.exp * 1000 > Date.now()
+  } catch {
+    return false // not a JWT at all — e.g. a stale value from the old boolean flag
+  }
+}
 
 function ProtectedLayout({ onLogout }: { onLogout: () => void }) {
   return (
@@ -38,18 +51,20 @@ function ProtectedLayout({ onLogout }: { onLogout: () => void }) {
 }
 
 function App() {
-  const [authed, setAuthed] = useState(() => {
-    const stored = sessionStorage.getItem(SESSION_KEY)
-    return stored === 'true'
-  })
+  // Signed in means "holds a token that has not expired". This used to compare
+  // the stored value to the string 'true' — left over from the old boolean flag
+  // when the session became a JWT — so every reload or deep link logged the admin
+  // out. Expiry is read from the token so a dead one shows the login screen
+  // instead of a dashboard full of 401s; the server still verifies every request.
+  const [authed, setAuthed] = useState(() => hasLiveToken(getAdminToken()))
 
   const handleLogin = () => {
-    sessionStorage.setItem(SESSION_KEY, 'true')
+    // token was stored by adminLogin()
     setAuthed(true)
   }
 
   const handleLogout = () => {
-    sessionStorage.removeItem(SESSION_KEY)
+    clearAdminToken()
     setAuthed(false)
   }
 

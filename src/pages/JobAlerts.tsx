@@ -3,7 +3,8 @@ import { Send, Users, Briefcase, ExternalLink, Search, RefreshCw } from 'lucide-
 import StatCard from '../components/StatCard'
 import ErrorState from '../components/ErrorState'
 import { fetchJobAlertHistory } from '../utils/api'
-import { formatRelativeTime, formatPhone } from '../utils/format'
+import { formatRelativeTime } from '../utils/format'
+import RevealPhone from '../components/RevealPhone'
 
 interface Alert {
   sent_at: string
@@ -23,13 +24,14 @@ type Mode = 'user' | 'job'
 
 /** Group alerts by whichever side of the pairing is being viewed. */
 function group(alerts: Alert[], mode: Mode) {
-  const out = new Map<string, { title: string; subtitle: string; rows: Alert[] }>()
+  const out = new Map<string, { title: string; subtitle: string; phoneRef?: string; rows: Alert[] }>()
   for (const a of alerts) {
     const key = mode === 'user' ? a.user_id : a.job_id
     if (!out.has(key)) {
       out.set(key, mode === 'user'
         ? { title: a.user_name || '(user record gone)',
-            subtitle: a.user_phone ? formatPhone(a.user_phone) : a.user_id,
+            subtitle: a.user_phone || a.user_id,
+            phoneRef: a.user_phone ? a.user_id : undefined,
             rows: [] }
         : { title: a.job_title || '(job record pruned)',
             subtitle: [a.job_source, a.job_location].filter(Boolean).join(' · ') || a.job_id,
@@ -136,7 +138,11 @@ export default function JobAlerts() {
               <div className="flex items-baseline justify-between mb-3">
                 <div>
                   <h2 className="font-semibold">{g.title}</h2>
-                  <p className="text-xs text-gray-500">{g.subtitle}</p>
+                  <p className="text-xs text-gray-500">
+                    {g.phoneRef
+                      ? <RevealPhone masked={g.subtitle} kind="user" refId={g.phoneRef} />
+                      : g.subtitle}
+                  </p>
                 </div>
                 <span className="text-xs text-gray-400 shrink-0 ml-4">
                   {g.rows.length} {mode === 'user' ? 'job' : 'recipient'}{g.rows.length === 1 ? '' : 's'}
