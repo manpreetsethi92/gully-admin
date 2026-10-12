@@ -1,14 +1,12 @@
 import { useEffect, useState } from 'react'
-import { Download, Filter, Send, Loader2 } from 'lucide-react'
-import {
-  fetchJobAlertStats,
-  triggerScrape,
-  triggerProcessQueue,
-  triggerJobAlerts,
-} from '../utils/api'
+import { Download, Send, Loader2 } from 'lucide-react'
+import { fetchJobAlertStats, triggerScrapeIngest, triggerJobAlerts } from '../utils/api'
 import { formatRelativeTime } from '../utils/format'
 
-const SOURCES = ['reddit', 'twitter', 'facebook', 'craigslist', 'threads']
+// scrape_and_save_jobs takes a skill and an optional location and runs every
+// source itself — there is no per-source ingest, so this is a skill box, not a
+// source picker. Seeded from what the current alert recipients actually do.
+const SKILL_SUGGESTIONS = ['creative', 'video', 'writer', 'developer', 'marketing', 'design']
 
 interface AlertStats {
   sent_7d: number
@@ -23,7 +21,8 @@ interface Props {
 }
 
 export default function PipelineControls({ onDone }: Props) {
-  const [source, setSource] = useState(SOURCES[0])
+  const [skill, setSkill] = useState(SKILL_SUGGESTIONS[0])
+  const [location, setLocation] = useState('')
   const [running, setRunning] = useState<string | null>(null)
   const [result, setResult] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -69,39 +68,38 @@ export default function PipelineControls({ onDone }: Props) {
         )}
       </div>
       <p className="text-gray-400 text-sm mb-5">
-        Each step feeds the funnel below. Run them in order.
+        Scraping saves straight to opportunities; there is no classify step on this path.
       </p>
 
       <div className="flex flex-wrap items-center gap-3">
-        <select
-          value={source}
-          onChange={(e) => setSource(e.target.value)}
+        <input
+          value={skill}
+          onChange={(e) => setSkill(e.target.value)}
           disabled={busy}
-          className="bg-dark-bg border border-dark-border rounded-lg px-3 py-2 text-sm disabled:opacity-40"
-        >
-          {SOURCES.map((s) => (
-            <option key={s} value={s}>{s}</option>
-          ))}
-        </select>
+          list="skill-suggestions"
+          placeholder="skill, e.g. video"
+          className="bg-dark-bg border border-dark-border rounded-lg px-3 py-2 text-sm w-40 disabled:opacity-40"
+        />
+        <datalist id="skill-suggestions">
+          {SKILL_SUGGESTIONS.map((s) => <option key={s} value={s} />)}
+        </datalist>
+
+        <input
+          value={location}
+          onChange={(e) => setLocation(e.target.value)}
+          disabled={busy}
+          placeholder="location (optional)"
+          className="bg-dark-bg border border-dark-border rounded-lg px-3 py-2 text-sm w-44 disabled:opacity-40"
+        />
 
         <button
-          disabled={busy}
-          onClick={() => run('Scrape', () => triggerScrape(source),
-            (d) => `${d.inserted ?? d.count ?? 0} jobs added from ${source}`)}
+          disabled={busy || skill.trim().length < 2}
+          onClick={() => run('Scrape', () => triggerScrapeIngest(skill.trim(), location.trim()),
+            (d) => `${d.newly_added ?? 0} new jobs saved (${d.saved ?? 0} returned, rest were duplicates)`)}
           className={`${btn} bg-gray-800 hover:bg-gray-700 text-gray-300`}
         >
           {running === 'Scrape' ? <Loader2 size={16} className="animate-spin" /> : <Download size={16} />}
           1. Scrape Jobs
-        </button>
-
-        <button
-          disabled={busy}
-          onClick={() => run('Classify', triggerProcessQueue,
-            (d) => `${d.processed ?? 0} processed, ${d.failed ?? 0} failed`)}
-          className={`${btn} bg-gray-800 hover:bg-gray-700 text-gray-300`}
-        >
-          {running === 'Classify' ? <Loader2 size={16} className="animate-spin" /> : <Filter size={16} />}
-          2. Classify Queue
         </button>
 
         <button
@@ -111,7 +109,7 @@ export default function PipelineControls({ onDone }: Props) {
           className={`${btn} bg-accent hover:bg-accent/90 text-white`}
         >
           {running === 'Send' ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
-          3. Send Alerts{recipients > 0 ? ` (${recipients})` : ''}
+          2. Send Alerts{recipients > 0 ? ` (${recipients})` : ''}
         </button>
       </div>
 

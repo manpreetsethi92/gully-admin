@@ -3,7 +3,8 @@ import StatCard from '../components/StatCard'
 import ErrorState from '../components/ErrorState'
 import { CheckCircle, AlertCircle, Users, TrendingUp, Send, RefreshCw } from 'lucide-react'
 import { fetchBlastStats, fetchBlastContacts } from '../utils/api'
-import { formatRelativeTime, formatPhone } from '../utils/format'
+import { formatRelativeTime } from '../utils/format'
+import RevealPhone from '../components/RevealPhone'
 
 interface BlastStats {
   total_contacts?: number
@@ -14,6 +15,8 @@ interface BlastStats {
 }
 
 interface BlastContact {
+  /** outreach_contacts _id as a string — the key the reveal endpoint takes */
+  ref?: string
   phone: string
   phone_display?: string
   source_group?: string
@@ -114,8 +117,10 @@ export default function Messaging() {
                 {filtered.slice(0, 200).map((c, i) => {
                   const { label, color } = getContactStatus(c)
                   return (
-                    <tr key={c.phone + i} className="hover:bg-white/5">
-                      <td className="px-4 py-3 text-sm font-mono text-gray-300">{c.phone_display || formatPhone(c.phone)}</td>
+                    <tr key={c.ref || i} className="hover:bg-white/5">
+                      <td className="px-4 py-3 text-sm text-gray-300">
+                        <RevealPhone masked={c.phone_display || c.phone} kind="outreach_contact" refId={c.ref} />
+                      </td>
                       <td className="px-4 py-3 text-sm text-gray-400">{c.source_group || '—'}</td>
                       <td className="px-4 py-3">
                         <span className={`px-2 py-1 rounded-full text-xs font-medium border ${color}`}>{label}</span>

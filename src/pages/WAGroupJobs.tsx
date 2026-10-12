@@ -4,8 +4,9 @@ import DataTable from '../components/DataTable'
 import { Zap, Users, Target, TrendingUp } from 'lucide-react'
 import { fetchWAGroupJobs } from '../utils/api'
 import { WAGroupJob } from '../types'
-import { formatPhone, truncate, formatRelativeTime } from '../utils/format'
+import { truncate, formatRelativeTime } from '../utils/format'
 import { getStatusColor, getUrgencyColor } from '../utils/colors'
+import RevealPhone from '../components/RevealPhone'
 
 export default function WAGroupJobs() {
   const [jobs, setJobs] = useState<WAGroupJob[]>([])
@@ -61,7 +62,7 @@ export default function WAGroupJobs() {
     {
       key: 'contact' as const,
       label: 'Contact',
-      render: (val: any) => <span className="text-sm">{val?.phone ? formatPhone(val.phone) : '—'}</span>,
+      render: (val: any, row: any) => <RevealPhone masked={val?.phone} kind="wa_group_contact" refId={row?.id} className="text-sm" />,
     },
     {
       key: 'matches_count' as const,
@@ -190,7 +191,7 @@ export default function WAGroupJobs() {
                 <h3 className="text-sm text-gray-400 mb-2">Contact Info</h3>
                 <div className="bg-dark-bg p-3 rounded text-sm space-y-1">
                   <p><span className="text-gray-400">Name:</span> {selectedJob.contact?.name || '—'}</p>
-                  <p><span className="text-gray-400">Phone:</span> {formatPhone(selectedJob.contact?.phone)}</p>
+                  <p><span className="text-gray-400">Phone:</span> <RevealPhone masked={selectedJob.contact?.phone} kind="wa_group_contact" refId={selectedJob.id} /></p>
                   <p><span className="text-gray-400">Email:</span> {selectedJob.contact?.email || '—'}</p>
                 </div>
               </div>

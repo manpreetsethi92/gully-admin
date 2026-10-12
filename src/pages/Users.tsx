@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback } from 'react'
 import { ChevronRight, X, Github, Youtube, RefreshCw, Zap } from 'lucide-react'
 import { fetchUsers, fetchUserDetail, fetchUserMesh } from '../utils/api'
 import { formatRelativeTime } from '../utils/format'
+import RevealPhone from '../components/RevealPhone'
 
 interface User {
   id: string
@@ -237,7 +238,7 @@ export default function Users() {
                         }
                         <div>
                           <p className="font-medium text-white">{user.name}</p>
-                          <p className="text-white/40 text-xs">{user.phone}</p>
+                          <p className="text-white/40 text-xs"><RevealPhone masked={user.phone} kind="user" refId={user.id} /></p>
                         </div>
                       </div>
                     </td>
@@ -279,7 +280,7 @@ export default function Users() {
                   }
                   <div>
                     <h2 className="font-bold text-white">{selected.user.name}</h2>
-                    <p className="text-white/40 text-xs">{selected.user.phone}</p>
+                    <p className="text-white/40 text-xs"><RevealPhone masked={selected.user.phone} kind="user" refId={selected.user.id} /></p>
                     <div className="flex gap-1 mt-1">
                       <Badge label={selected.user.verification_level || 'phone'} color={selected.user.verification_level === 'verified' ? 'green' : 'gray'} />
                       <Badge label={selected.user.subscription_tier || 'free'} color={selected.user.subscription_tier === 'pro' ? 'purple' : 'gray'} />
